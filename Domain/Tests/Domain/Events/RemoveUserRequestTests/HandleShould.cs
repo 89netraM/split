@@ -1,35 +1,32 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Split.Domain.Primitives;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 
-namespace Split.Domain.Tests.User.Events.CreateUserRequestTests;
+namespace Split.Domain.Tests.User.Events.RemoveUserRequestTests;
 
 [TestClass]
 public class HandleShould
 {
     [TestMethod]
-    public async Task SuccessfullyCreateAUser()
+    public async Task SuccessfullyRemoveAUser()
     {
         // Arrange
-        var handler = new CreateUserRequestHandler(
+        var handler = new RemoveUserRequestHandler(
             new UserService(
                 Substitute.For<ILogger<UserService>>(),
                 new FakeTimeProvider(),
                 Substitute.For<IUserRepository>()
             )
         );
-        var request = new CreateUserRequest("A. N. Other", new PhoneNumber("1234567890"));
+        var request = new RemoveUserRequest(new(Guid.NewGuid()));
 
-        // Act
-        var response = await handler.Handle(request, CancellationToken.None);
-
-        // Assert
-        Assert.IsNotNull(response);
+        // Act & Assert
+        await handler.Handle(request, CancellationToken.None);
     }
 }

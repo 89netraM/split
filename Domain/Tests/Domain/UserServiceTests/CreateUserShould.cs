@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Mediator;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +21,6 @@ public class CreateUserShould
         var phoneNumber = new PhoneNumber("1234567890");
         var userService = new UserService(
             Substitute.For<ILogger<UserService>>(),
-            Substitute.For<IMediator>(),
             new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00))),
             Substitute.For<IUserRepository>()
         );
@@ -49,12 +47,7 @@ public class CreateUserShould
         userRepository
             .GetUserByPhoneNumberAsync(existingUser.PhoneNumber, Arg.Any<CancellationToken>())
             .Returns(existingUser);
-        var userService = new UserService(
-            Substitute.For<ILogger<UserService>>(),
-            Substitute.For<IMediator>(),
-            timeProvider,
-            userRepository
-        );
+        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
 
         // Act
         var createdUser = await userService.CreateUserAsync(
@@ -81,12 +74,7 @@ public class CreateUserShould
         userRepository
             .GetUserByPhoneNumberAsync(existingUser.PhoneNumber, Arg.Any<CancellationToken>())
             .Returns(existingUser);
-        var userService = new UserService(
-            Substitute.For<ILogger<UserService>>(),
-            Substitute.For<IMediator>(),
-            timeProvider,
-            userRepository
-        );
+        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<PhoneNumberAlreadyExistsException>(() =>

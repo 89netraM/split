@@ -1,19 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Mediator;
 using Microsoft.Extensions.Logging;
 using Split.Domain.Primitives;
-using Split.Domain.User.Events;
 
 namespace Split.Domain.User;
 
-public class UserService(
-    ILogger<UserService> logger,
-    IMediator mediator,
-    TimeProvider timeProvider,
-    IUserRepository userRepository
-)
+public class UserService(ILogger<UserService> logger, TimeProvider timeProvider, IUserRepository userRepository)
 {
     public async Task<UserAggregate> CreateUserAsync(
         string name,
@@ -42,10 +35,26 @@ public class UserService(
 
         var newUser = new UserAggregate(name, phoneNumber, timeProvider.GetUtcNow());
         await userRepository.SaveAsync(newUser, cancellationToken);
-        await mediator.Publish(new UserCreatedEvent(newUser.Id), cancellationToken);
 
         logger.LogDebug("Successfully created new user with ID: {UserId}", newUser.Id);
         return newUser;
+    }
+
+    public async Task RemoveUserAsync(UserId userId, CancellationToken cancellationToken)
+    {
+        logger.LogDebug("Removing user with ID: {UserId}", userId);
+
+        var user = await userRepository.GetUserByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            logger.LogDebug("Cannot remove user ({UserId}) that does not exist", userId);
+            return;
+        }
+
+        user.Remove(timeProvider.GetUtcNow());
+        await userRepository.SaveAsync(user, cancellationToken);
+
+        logger.LogDebug("Successfully removed user with ID: {UserId}", user.Id);
     }
 }
 

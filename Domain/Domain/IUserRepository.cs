@@ -7,5 +7,6 @@ namespace Split.Domain.User;
 public interface IUserRepository
 {
     Task<UserAggregate?> GetUserByPhoneNumberAsync(PhoneNumber phoneNumber, CancellationToken cancellationToken);
+    Task<UserAggregate?> GetUserByIdAsync(UserId userId, CancellationToken cancellationToken);
     Task SaveAsync(UserAggregate user, CancellationToken cancellationToken);
 }
