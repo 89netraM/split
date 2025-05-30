@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Split.Domain.Primitives</RootNamespace>
+    <AssemblyName>Split.Domain.Primitives</AssemblyName>
+  </PropertyGroup>
+</Project>
