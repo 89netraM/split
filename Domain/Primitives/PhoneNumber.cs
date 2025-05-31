@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Split.Domain.Primitives;
@@ -22,5 +23,6 @@ public partial class PhoneNumber
         Value = value;
     }
 
+    [ExcludeFromCodeCoverage]
     public override string ToString() => Value;
 }

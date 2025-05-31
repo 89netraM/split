@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Split.Utilities;
 
 [DebuggerDisplay("Count = {Count}")]
+[ExcludeFromCodeCoverage]
 public class NonEmptyImmutableSet<T>(T first, params ImmutableHashSet<T> rest) : IImmutableSet<T>
 {
     private readonly ImmutableHashSet<T> set = rest.Add(first);

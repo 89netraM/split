@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Split.Domain.Primitives;
 
@@ -20,6 +21,7 @@ public class Money : IComparable<Money>, IEquatable<Money>
         Currency = currency;
     }
 
+    [ExcludeFromCodeCoverage]
     public override string ToString() => $"{Amount} {Currency}";
 
     public bool Equals(Money? other) =>
@@ -39,19 +41,27 @@ public class Money : IComparable<Money>, IEquatable<Money>
         return Amount.CompareTo(other.Amount);
     }
 
+    [ExcludeFromCodeCoverage]
     public override bool Equals(object? obj) => Equals(obj as Money);
 
+    [ExcludeFromCodeCoverage]
     public override int GetHashCode() => HashCode.Combine(Amount, Currency);
 
+    [ExcludeFromCodeCoverage]
     public static bool operator ==(Money? left, Money? right) => left is null ? right is null : left.Equals(right);
 
+    [ExcludeFromCodeCoverage]
     public static bool operator !=(Money? left, Money? right) => !(left == right);
 
+    [ExcludeFromCodeCoverage]
     public static bool operator <(Money left, Money right) => left.CompareTo(right) < 0;
 
+    [ExcludeFromCodeCoverage]
     public static bool operator <=(Money left, Money right) => left.CompareTo(right) <= 0;
 
+    [ExcludeFromCodeCoverage]
     public static bool operator >(Money left, Money right) => left.CompareTo(right) > 0;
 
+    [ExcludeFromCodeCoverage]
     public static bool operator >=(Money left, Money right) => left.CompareTo(right) >= 0;
 }
