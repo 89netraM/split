@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Split.Utilities</RootNamespace>
+    <AssemblyName>Split.Utilities</AssemblyName>
+  </PropertyGroup>
+</Project>
