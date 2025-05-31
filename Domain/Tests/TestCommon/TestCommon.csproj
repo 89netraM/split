@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Split.Domain.Tests.TestCommon</RootNamespace>
+    <AssemblyName>Split.Domain.Tests.TestCommon</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Transaction\Transaction.csproj" />
+  </ItemGroup>
+</Project>

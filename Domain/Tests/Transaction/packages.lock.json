@@ -61,6 +61,11 @@
           "System.Diagnostics.DiagnosticSource": "5.0.0"
         }
       },
+      "Microsoft.Bcl.AsyncInterfaces": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg=="
+      },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
         "resolved": "17.12.0",
@@ -172,13 +177,20 @@
       "Split.Domain.Primitives": {
         "type": "Project"
       },
+      "Split.Domain.Tests.TestCommon": {
+        "type": "Project",
+        "dependencies": {
+          "Split.Domain.Transaction": "[1.0.0, )"
+        }
+      },
       "Split.Domain.Transaction": {
         "type": "Project",
         "dependencies": {
           "Mediator.Abstractions": "[3.0.0-preview.65, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.5, )",
           "Split.Domain.Primitives": "[1.0.0, )",
-          "Split.Utilities": "[1.0.0, )"
+          "Split.Utilities": "[1.0.0, )",
+          "System.Linq.Async": "[6.0.1, )"
         }
       },
       "Split.Utilities": {
@@ -200,6 +212,15 @@
         "contentHash": "pP1PADCrIxMYJXxFmTVbAgEU7GVpjK5i0/tyfU9DiE0oXQy3JWQaOVgCkrCiePLgS8b5sghM3Fau3EeHiVWbCg==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.5"
+        }
+      },
+      "System.Linq.Async": {
+        "type": "CentralTransitive",
+        "requested": "[6.0.1, )",
+        "resolved": "6.0.1",
+        "contentHash": "0YhHcaroWpQ9UCot3Pizah7ryAzQhNvobLMSxeDIGmnXfkQn8u5owvpOH0K6EVB+z9L7u6Cc4W17Br/+jyttEQ==",
+        "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "6.0.0"
         }
       }
     },

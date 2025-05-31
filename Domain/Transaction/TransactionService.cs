@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -41,6 +42,16 @@ public class TransactionService(
         logger.LogDebug("Transaction created: {TransactionId}", transaction.Id);
 
         return transaction;
+    }
+
+    public IAsyncEnumerable<TransactionAggregate> GetTransactionsInvolvingUserAsync(
+        UserId userId,
+        CancellationToken cancellationToken
+    )
+    {
+        logger.LogDebug("Retrieving transactions involving user ID {UserId}", userId);
+
+        return transactionRepository.GetTransactionsInvolvingUserAsync(userId, cancellationToken);
     }
 
     public async Task RemoveTransactionAsync(TransactionId transactionId, CancellationToken cancellationToken)
