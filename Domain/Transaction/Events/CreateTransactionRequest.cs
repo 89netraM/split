@@ -13,7 +13,7 @@ public record CreateTransactionRequest(
     NonEmptyImmutableSet<UserId> RecipientIds
 ) : IRequest<CreateTransactionResponse>;
 
-public record CreateTransactionResponse(TransactionEntity Transaction);
+public record CreateTransactionResponse(TransactionAggregate Transaction);
 
 public class CreateTransactionRequestHandler(TransactionService transactionService)
     : IRequestHandler<CreateTransactionRequest, CreateTransactionResponse>
