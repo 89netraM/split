@@ -4,13 +4,13 @@ using System.Diagnostics;
 namespace Split.Domain.Primitives;
 
 [DebuggerDisplay("{Value}")]
-public class UserId
+public class UserId : IEquatable<UserId>
 {
-    public Guid Value { get; }
+    public string Value { get; }
 
-    public UserId(Guid value)
+    public UserId(string value)
     {
-        if (value == Guid.Empty)
+        if (string.IsNullOrWhiteSpace(value))
         {
             throw new ArgumentException("UserId cannot be empty", nameof(value));
         }
@@ -18,5 +18,15 @@ public class UserId
         Value = value;
     }
 
-    public override string ToString() => Value.ToString();
+    public override string ToString() => Value;
+
+    public bool Equals(UserId? other) => other is not null && Value.Equals(other.Value);
+
+    public override bool Equals(object? obj) => Equals(obj as UserId);
+
+    public override int GetHashCode() => Value.GetHashCode();
+
+    public static bool operator ==(UserId? left, UserId? right) => left is null ? right is null : left.Equals(right);
+
+    public static bool operator !=(UserId? left, UserId? right) => !(left == right);
 }

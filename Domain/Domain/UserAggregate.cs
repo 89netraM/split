@@ -17,9 +17,9 @@ public class UserAggregate
     public IReadOnlyCollection<INotification> DomainEvents => domainEvents;
     private readonly List<INotification> domainEvents = [];
 
-    public UserAggregate(string name, PhoneNumber phoneNumber, DateTimeOffset createdAt)
+    public UserAggregate(UserId id, string name, PhoneNumber phoneNumber, DateTimeOffset createdAt)
     {
-        Id = new(Guid.NewGuid());
+        Id = id;
         Name = name;
         PhoneNumber = phoneNumber;
         CreatedAt = createdAt;

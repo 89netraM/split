@@ -9,31 +9,34 @@ namespace Split.Domain.User;
 public class UserService(ILogger<UserService> logger, TimeProvider timeProvider, IUserRepository userRepository)
 {
     public async Task<UserAggregate> CreateUserAsync(
+        UserId userId,
         string name,
         PhoneNumber phoneNumber,
         CancellationToken cancellationToken
     )
     {
-        logger.LogDebug("Creating user with name: {Name} and phone number: {PhoneNumber}", name, phoneNumber);
+        logger.LogDebug("Creating user with id {UserId}", userId);
 
-        var existingUser = await userRepository.GetUserByPhoneNumberAsync(phoneNumber, cancellationToken);
+        var existingUser = await userRepository.GetUserByIdAsync(userId, cancellationToken);
         if (existingUser is not null)
         {
-            if (existingUser.Name == name)
+            if (existingUser.Name == name && existingUser.PhoneNumber == phoneNumber)
             {
-                logger.LogInformation(
-                    "User with phone number {PhoneNumber} already exists with the same name",
-                    phoneNumber
-                );
+                logger.LogInformation("User with id {UserId} already exists with the same properties", userId);
                 return existingUser;
             }
             else
             {
-                throw new PhoneNumberAlreadyExistsException(phoneNumber);
+                throw new UserAlreadyExistsException(userId);
             }
         }
 
-        var newUser = new UserAggregate(name, phoneNumber, timeProvider.GetUtcNow());
+        if (await userRepository.IsPhoneNumberInUse(phoneNumber, cancellationToken))
+        {
+            throw new PhoneNumberInUseException(phoneNumber);
+        }
+
+        var newUser = new UserAggregate(userId, name, phoneNumber, timeProvider.GetUtcNow());
         await userRepository.SaveAsync(newUser, cancellationToken);
 
         logger.LogDebug("Successfully created new user with ID: {UserId}", newUser.Id);
@@ -58,5 +61,7 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
     }
 }
 
-public class PhoneNumberAlreadyExistsException(PhoneNumber phoneNumber)
+public class UserAlreadyExistsException(UserId userId) : Exception($"A user with this id {userId} already exists");
+
+public class PhoneNumberInUseException(PhoneNumber phoneNumber)
     : Exception($"A user with this phone number {phoneNumber} already exists");

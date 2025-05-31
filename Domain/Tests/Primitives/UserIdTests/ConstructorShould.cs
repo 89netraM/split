@@ -8,23 +8,24 @@ namespace Split.Domain.Tests.Primitives.UserIdTests;
 public class ConstructorShould
 {
     [TestMethod]
-    public void ConstructValidUserId()
+    [DataRow("c973be76-8b35-49e6-8fc0-24f2b968a0d0")]
+    [DataRow("12345678-1234-1234-1234-123456789012")]
+    [DataRow("00000000-0000-0000-0000-000000000000")]
+    [DataRow("a-n-other")]
+    public void ConstructValidUserId(string userId)
     {
-        // Arrange
-        var userId = "c973be76-8b35-49e6-8fc0-24f2b968a0d0";
-
         // Act & Assert
         // Should not throw an exception for a valid UserId
-        _ = new UserId(new(userId));
+        _ = new UserId(userId);
     }
 
     [TestMethod]
-    public void ThrowExceptionForEmptyUserId()
+    [DataRow("")]
+    [DataRow("    ")]
+    [DataRow("\t")]
+    public void ThrowExceptionForEmptyUserId(string userId)
     {
-        // Arrange
-        var emptyUserId = Guid.Empty;
-
         // Act & Assert
-        Assert.ThrowsException<ArgumentException>(() => new UserId(emptyUserId));
+        Assert.ThrowsException<ArgumentException>(() => new UserId(userId));
     }
 }

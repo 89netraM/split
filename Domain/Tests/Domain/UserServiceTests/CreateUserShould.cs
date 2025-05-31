@@ -26,7 +26,12 @@ public class CreateUserShould
         );
 
         // Act
-        var user = await userService.CreateUserAsync(name, phoneNumber, CancellationToken.None);
+        var user = await userService.CreateUserAsync(
+            new("ea77aaef-e57a-4d30-8e62-acb514f7b1be"),
+            name,
+            phoneNumber,
+            CancellationToken.None
+        );
 
         // Assert
         Assert.IsNotNull(user);
@@ -42,15 +47,19 @@ public class CreateUserShould
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
         };
-        var existingUser = new UserAggregate("A. N. Other", new("1234567890"), timeProvider.GetUtcNow());
+        var existingUser = new UserAggregate(
+            new("a615cde3-c61e-47f7-9093-19bef8085edf"),
+            "A. N. Other",
+            new("1234567890"),
+            timeProvider.GetUtcNow()
+        );
         var userRepository = Substitute.For<IUserRepository>();
-        userRepository
-            .GetUserByPhoneNumberAsync(existingUser.PhoneNumber, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
+        userRepository.GetUserByIdAsync(existingUser.Id, Arg.Any<CancellationToken>()).Returns(existingUser);
         var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
 
         // Act
         var createdUser = await userService.CreateUserAsync(
+            existingUser.Id,
             existingUser.Name,
             existingUser.PhoneNumber,
             CancellationToken.None
@@ -65,20 +74,65 @@ public class CreateUserShould
     }
 
     [TestMethod]
-    public async Task ThrowIfPhoneNumberAlreadyExistsWithDifferentName()
+    public async Task ThrowIfIdAlreadyExistsWithDifferentName()
     {
         // Arrange
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00)));
-        var existingUser = new UserAggregate("Existing User", new PhoneNumber("1234567890"), timeProvider.GetUtcNow());
+        var existingUser = new UserAggregate(
+            new("97b0f29d-60f9-44ea-af47-65c5a627536e"),
+            "Existing User",
+            new PhoneNumber("1234567890"),
+            timeProvider.GetUtcNow()
+        );
         var userRepository = Substitute.For<IUserRepository>();
-        userRepository
-            .GetUserByPhoneNumberAsync(existingUser.PhoneNumber, Arg.Any<CancellationToken>())
-            .Returns(existingUser);
+        userRepository.GetUserByIdAsync(existingUser.Id, Arg.Any<CancellationToken>()).Returns(existingUser);
         var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
 
         // Act & Assert
-        await Assert.ThrowsExceptionAsync<PhoneNumberAlreadyExistsException>(() =>
-            userService.CreateUserAsync("New User", existingUser.PhoneNumber, CancellationToken.None)
+        await Assert.ThrowsExceptionAsync<UserAlreadyExistsException>(() =>
+            userService.CreateUserAsync(existingUser.Id, "New User", existingUser.PhoneNumber, CancellationToken.None)
+        );
+    }
+
+    [TestMethod]
+    public async Task ThrowIfIdAlreadyExistsWithDifferentPhoneNumber()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00)));
+        var existingUser = new UserAggregate(
+            new("97b0f29d-60f9-44ea-af47-65c5a627536e"),
+            "A. N. Other",
+            new PhoneNumber("1234567890"),
+            timeProvider.GetUtcNow()
+        );
+        var userRepository = Substitute.For<IUserRepository>();
+        userRepository.GetUserByIdAsync(existingUser.Id, Arg.Any<CancellationToken>()).Returns(existingUser);
+        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
+
+        // Act & Assert
+        await Assert.ThrowsExceptionAsync<UserAlreadyExistsException>(() =>
+            userService.CreateUserAsync(existingUser.Id, existingUser.Name, new("0987654321"), CancellationToken.None)
+        );
+    }
+
+    [TestMethod]
+    public async Task ThrowIfAnotherUserHasTheSamePhoneNumber()
+    {
+        // Arrange
+        var id = new UserId("f35a40a1-cd24-46d0-a776-73f7111ed3e8");
+        var name = "A. N. Other";
+        var phoneNumber = new PhoneNumber("1234567890");
+        var userRepository = Substitute.For<IUserRepository>();
+        userRepository.IsPhoneNumberInUse(phoneNumber, Arg.Any<CancellationToken>()).Returns(true);
+        var userService = new UserService(
+            Substitute.For<ILogger<UserService>>(),
+            new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00))),
+            userRepository
+        );
+
+        // Act & Assert
+        await Assert.ThrowsExceptionAsync<PhoneNumberInUseException>(() =>
+            userService.CreateUserAsync(id, name, phoneNumber, CancellationToken.None)
         );
     }
 }

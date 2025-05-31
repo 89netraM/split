@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -24,7 +23,7 @@ public class HandleShould
                 Substitute.For<IUserRepository>()
             )
         );
-        var request = new RemoveUserRequest(new(Guid.NewGuid()));
+        var request = new RemoveUserRequest(new("6ef5ae5c-575a-4971-afeb-ee4fd0ccd2e4"));
 
         // Act & Assert
         await handler.Handle(request, CancellationToken.None);

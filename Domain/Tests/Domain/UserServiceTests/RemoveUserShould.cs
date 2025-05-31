@@ -18,7 +18,12 @@ public class RemoveUserShould
     {
         // Arrange
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 01, 27, 00, new(02, 00, 00)));
-        var user = new UserAggregate("A. N. Other", new("1234567890"), timeProvider.GetUtcNow());
+        var user = new UserAggregate(
+            new("8d09b539-6019-43d5-a133-18372d77576e"),
+            "A. N. Other",
+            new("1234567890"),
+            timeProvider.GetUtcNow()
+        );
         var userRepository = Substitute.For<IUserRepository>();
         userRepository.GetUserByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
         var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
@@ -36,7 +41,7 @@ public class RemoveUserShould
     {
         // Arrange
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 01, 27, 00, new(02, 00, 00)));
-        var userId = new UserId(Guid.NewGuid());
+        var userId = new UserId("063db591-512f-4b5e-8e20-e78950419ec2");
         var userRepository = Substitute.For<IUserRepository>();
         userRepository.GetUserByIdAsync(userId, Arg.Any<CancellationToken>()).Returns((UserAggregate?)null);
         var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
@@ -56,7 +61,12 @@ public class RemoveUserShould
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
         };
-        var user = new UserAggregate("A. N. Other", new("1234567890"), timeProvider.GetUtcNow());
+        var user = new UserAggregate(
+            new("8371ebfb-70a3-48a7-ae64-afc80c37d955"),
+            "A. N. Other",
+            new("1234567890"),
+            timeProvider.GetUtcNow()
+        );
         var removedAt = timeProvider.GetUtcNow();
         user.Remove(removedAt);
         var userRepository = Substitute.For<IUserRepository>();
