@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mediator;
 using Split.Domain.Primitives;
 using Split.Domain.User.Events;
@@ -13,6 +14,9 @@ public class UserAggregate
     public PhoneNumber PhoneNumber { get; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? RemovedAt { get; private set; }
+
+    public IReadOnlyList<Friendship> Friendships => friendships;
+    private readonly List<Friendship> friendships = [];
 
     public IReadOnlyCollection<INotification> DomainEvents => domainEvents;
     private readonly List<INotification> domainEvents = [];
@@ -36,4 +40,24 @@ public class UserAggregate
         RemovedAt = removedAt;
         domainEvents.Add(new UserRemovedEvent(this));
     }
+
+    public void CreateFriendship(UserAggregate friend, DateTimeOffset createdAt)
+    {
+        if (Friendships.Any(f => f.FriendId == friend.Id))
+        {
+            return;
+        }
+
+        if (friend.Id == Id)
+        {
+            throw new AutoFriendshipException();
+        }
+
+        friendships.Add(new(friend.Id, createdAt));
+        friend.friendships.Add(new(Id, createdAt));
+
+        domainEvents.Add(new FriendshipCreatedEvent(this, friend));
+    }
 }
+
+public class AutoFriendshipException() : Exception("Cannot create a friendship with oneself");

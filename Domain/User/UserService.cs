@@ -59,9 +59,34 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
 
         logger.LogDebug("Successfully removed user with ID: {UserId}", user.Id);
     }
+
+    public async Task CreateFriendshipAsync(UserId initiatorId, UserId targetId, CancellationToken cancellationToken)
+    {
+        logger.LogDebug("Creating friendship between {InitiatorId} and {TargetId}", initiatorId, targetId);
+
+        var initiator =
+            await userRepository.GetUserByIdAsync(initiatorId, cancellationToken)
+            ?? throw new UserNotFoundException(initiatorId);
+        var target =
+            await userRepository.GetUserByIdAsync(targetId, cancellationToken)
+            ?? throw new UserNotFoundException(targetId);
+
+        target.CreateFriendship(initiator, timeProvider.GetUtcNow());
+
+        await userRepository.SaveAsync(initiator, cancellationToken);
+        await userRepository.SaveAsync(target, cancellationToken);
+
+        logger.LogDebug(
+            "Successfully created friendship between {InitiatorId} and {TargetId}",
+            initiator.Id,
+            target.Id
+        );
+    }
 }
 
 public class UserAlreadyExistsException(UserId userId) : Exception($"A user with this id {userId} already exists");
 
 public class PhoneNumberInUseException(PhoneNumber phoneNumber)
     : Exception($"A user with this phone number {phoneNumber} already exists");
+
+public class UserNotFoundException(UserId userId) : Exception($"A user with this id {userId} does not exist");
