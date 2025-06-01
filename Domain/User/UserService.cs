@@ -82,6 +82,34 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
             target.Id
         );
     }
+
+    public async Task RemoveFriendshipAsync(UserId initiatorId, UserId targetId, CancellationToken cancellationToken)
+    {
+        logger.LogDebug("Removing friendship between {InitiatorId} and {TargetId}", initiatorId, targetId);
+
+        var initiator = await userRepository.GetUserByIdAsync(initiatorId, cancellationToken);
+        var target = await userRepository.GetUserByIdAsync(targetId, cancellationToken);
+        if (initiator is null || target is null)
+        {
+            logger.LogDebug(
+                "Cannot remove friendship between {InitiatorId} and {TargetId} because one of the users does not exist",
+                initiatorId,
+                targetId
+            );
+            return;
+        }
+
+        target.RemoveFriendship(initiator, timeProvider.GetUtcNow());
+
+        await userRepository.SaveAsync(initiator, cancellationToken);
+        await userRepository.SaveAsync(target, cancellationToken);
+
+        logger.LogDebug(
+            "Successfully removed friendship between {InitiatorId} and {TargetId}",
+            initiator.Id,
+            target.Id
+        );
+    }
 }
 
 public class UserAlreadyExistsException(UserId userId) : Exception($"A user with this id {userId} already exists");
