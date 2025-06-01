@@ -64,4 +64,7 @@ public class Money : IComparable<Money>, IEquatable<Money>
 
     [ExcludeFromCodeCoverage]
     public static bool operator >=(Money left, Money right) => left.CompareTo(right) >= 0;
+
+    [ExcludeFromCodeCoverage]
+    public static Money operator /(Money left, decimal right) => new(left.Amount / right, left.Currency);
 }

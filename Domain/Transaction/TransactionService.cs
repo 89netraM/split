@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -52,6 +55,54 @@ public class TransactionService(
         logger.LogDebug("Retrieving transactions involving user ID {UserId}", userId);
 
         return transactionRepository.GetTransactionsInvolvingUserAsync(userId, cancellationToken);
+    }
+
+    public IAsyncEnumerable<Balance> GetBalanceForUserAsync(UserId userId, CancellationToken cancellationToken)
+    {
+        logger.LogDebug("Retrieving balance for user ID {UserId}", userId);
+
+        return transactionRepository
+            .GetTransactionsInvolvingUserAsync(userId, cancellationToken)
+            .SelectMany(transaction =>
+                transaction
+                    .RecipientIds.Select(to => new Balance(
+                        transaction.SenderId,
+                        to,
+                        transaction.Amount / transaction.RecipientIds.Count
+                    ))
+                    .ToAsyncEnumerable()
+            )
+            .GroupByAwait(info => ValueTask.FromResult(info.To != userId ? info.To : info.From), AggregateBalance)
+            .SelectMany(g => g.ToAsyncEnumerable());
+
+        static async ValueTask<IEnumerable<Balance>> AggregateBalance(UserId _, IAsyncEnumerable<Balance> group)
+        {
+            var balanceByCurrency = new Dictionary<Currency, Balance>();
+            await foreach (var balanceToAdd in group)
+            {
+                if (balanceByCurrency.TryGetValue(balanceToAdd.Amount.Currency, out var balance))
+                {
+                    var amount =
+                        balanceToAdd.To == balance.To
+                            ? balance.Amount.Amount + balanceToAdd.Amount.Amount
+                            : balance.Amount.Amount - balanceToAdd.Amount.Amount;
+                    if (amount >= 0)
+                    {
+                        balance = new Balance(balance.From, balance.To, new Money(amount, balance.Amount.Currency));
+                    }
+                    else
+                    {
+                        balance = new Balance(balance.To, balance.From, new Money(-amount, balance.Amount.Currency));
+                    }
+                }
+                else
+                {
+                    balance = new Balance(balanceToAdd.From, balanceToAdd.To, balanceToAdd.Amount);
+                }
+                balanceByCurrency[balance.Amount.Currency] = balance;
+            }
+            return balanceByCurrency.Values;
+        }
     }
 
     public async Task RemoveTransactionAsync(TransactionId transactionId, CancellationToken cancellationToken)
