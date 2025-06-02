@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Split.Domain.Primitives;
 using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
@@ -41,7 +40,7 @@ public class CreateTransactionShould
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
-            Substitute.For<ITransactionRepository>(),
+            new InMemoryTransactionRepository(),
             userRepository
         );
 
@@ -88,7 +87,7 @@ public class CreateTransactionShould
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
-            Substitute.For<ITransactionRepository>(),
+            new InMemoryTransactionRepository(),
             userRepository
         );
 
@@ -130,7 +129,7 @@ public class CreateTransactionShould
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
-            Substitute.For<ITransactionRepository>(),
+            new InMemoryTransactionRepository(),
             userRepository
         );
 

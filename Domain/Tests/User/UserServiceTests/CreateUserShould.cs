@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Split.Domain.Primitives;
+using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 
 namespace Split.Domain.Tests.User.UserServiceTests;
@@ -20,9 +20,9 @@ public class CreateUserShould
         var name = "A. N. Other";
         var phoneNumber = new PhoneNumber("1234567890");
         var userService = new UserService(
-            Substitute.For<ILogger<UserService>>(),
+            new NullLogger<UserService>(),
             new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00))),
-            Substitute.For<IUserRepository>()
+            new InMemoryUserRepository()
         );
 
         // Act
@@ -53,9 +53,8 @@ public class CreateUserShould
             new("1234567890"),
             timeProvider.GetUtcNow()
         );
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(existingUser.Id, Arg.Any<CancellationToken>()).Returns(existingUser);
-        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
+        var userRepository = new InMemoryUserRepository(existingUser);
+        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act
         var createdUser = await userService.CreateUserAsync(
@@ -84,9 +83,8 @@ public class CreateUserShould
             new PhoneNumber("1234567890"),
             timeProvider.GetUtcNow()
         );
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(existingUser.Id, Arg.Any<CancellationToken>()).Returns(existingUser);
-        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
+        var userRepository = new InMemoryUserRepository(existingUser);
+        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<UserAlreadyExistsException>(() =>
@@ -105,9 +103,8 @@ public class CreateUserShould
             new PhoneNumber("1234567890"),
             timeProvider.GetUtcNow()
         );
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(existingUser.Id, Arg.Any<CancellationToken>()).Returns(existingUser);
-        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
+        var userRepository = new InMemoryUserRepository(existingUser);
+        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<UserAlreadyExistsException>(() =>
@@ -122,13 +119,14 @@ public class CreateUserShould
         var id = new UserId("f35a40a1-cd24-46d0-a776-73f7111ed3e8");
         var name = "A. N. Other";
         var phoneNumber = new PhoneNumber("1234567890");
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.IsPhoneNumberInUse(phoneNumber, Arg.Any<CancellationToken>()).Returns(true);
-        var userService = new UserService(
-            Substitute.For<ILogger<UserService>>(),
-            new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00))),
-            userRepository
+        var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00)))
+        {
+            AutoAdvanceAmount = TimeSpan.FromMinutes(1),
+        };
+        var userRepository = new InMemoryUserRepository(
+            new UserAggregate(new("user-id"), "Existing User", phoneNumber, timeProvider.GetUtcNow())
         );
+        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<PhoneNumberInUseException>(() =>

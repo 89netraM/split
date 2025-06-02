@@ -40,9 +40,7 @@ public class HandleShould
             timeProvider.GetUtcNow()
         );
 
-        var repository = new InMemoryTransactionRepository();
-        await repository.SaveAsync(transaction1, CancellationToken.None);
-        await repository.SaveAsync(transaction2, CancellationToken.None);
+        var repository = new InMemoryTransactionRepository(transaction1, transaction2);
 
         var balanceQueryHandler = new BalanceQueryHandler(
             new TransactionService(

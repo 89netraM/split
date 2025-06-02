@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
+using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 
@@ -25,9 +25,7 @@ public class HandleShould
         var userA = new UserAggregate(new("UserA"), "User A", new("0123456789"), timeProvider.GetUtcNow());
         var userB = new UserAggregate(new("UserB"), "User B", new("9876543210"), timeProvider.GetUtcNow());
 
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(userA.Id, Arg.Any<CancellationToken>()).Returns(userA);
-        userRepository.GetUserByIdAsync(userB.Id, Arg.Any<CancellationToken>()).Returns(userB);
+        var userRepository = new InMemoryUserRepository(userA, userB);
         var createFriendshipRequestHandler = new CreateFriendshipRequestHandler(
             new UserService(new NullLogger<UserService>(), timeProvider, userRepository)
         );

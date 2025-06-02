@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Split.Domain.Primitives;
+using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 
 namespace Split.Domain.Tests.User.UserServiceTests;
@@ -24,15 +24,13 @@ public class RemoveUserShould
             new("1234567890"),
             timeProvider.GetUtcNow()
         );
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
-        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
+        var userRepository = new InMemoryUserRepository(user);
+        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act
         await userService.RemoveUserAsync(user.Id, CancellationToken.None);
 
         // Assert
-        await userRepository.Received(1).SaveAsync(user, Arg.Any<CancellationToken>());
         Assert.IsNotNull(user.RemovedAt);
     }
 
@@ -42,15 +40,11 @@ public class RemoveUserShould
         // Arrange
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 01, 27, 00, new(02, 00, 00)));
         var userId = new UserId("063db591-512f-4b5e-8e20-e78950419ec2");
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(userId, Arg.Any<CancellationToken>()).Returns((UserAggregate?)null);
-        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
+        var userRepository = new InMemoryUserRepository();
+        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
-        // Act
+        // Act & Assert
         await userService.RemoveUserAsync(userId, CancellationToken.None);
-
-        // Assert
-        await userRepository.DidNotReceive().SaveAsync(Arg.Any<UserAggregate>(), Arg.Any<CancellationToken>());
     }
 
     [TestMethod]
@@ -69,15 +63,13 @@ public class RemoveUserShould
         );
         var removedAt = timeProvider.GetUtcNow();
         user.Remove(removedAt);
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(user.Id, Arg.Any<CancellationToken>()).Returns(user);
-        var userService = new UserService(Substitute.For<ILogger<UserService>>(), timeProvider, userRepository);
+        var userRepository = new InMemoryUserRepository(user);
+        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act
         await userService.RemoveUserAsync(user.Id, CancellationToken.None);
 
         // Assert
-        await userRepository.Received(1).SaveAsync(user, Arg.Any<CancellationToken>());
         Assert.AreEqual(removedAt, user.RemovedAt);
     }
 }

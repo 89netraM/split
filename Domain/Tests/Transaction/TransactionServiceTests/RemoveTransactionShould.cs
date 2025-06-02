@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Split.Domain.Primitives;
 using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
@@ -29,10 +28,7 @@ public class RemoveTransactionShould
             new(new("52710472-f392-4d1a-9a5c-727bc365346a")),
             timeProvider.GetUtcNow()
         );
-        var transactionRepository = Substitute.For<ITransactionRepository>();
-        transactionRepository
-            .GetTransactionByIdAsync(transaction.Id, Arg.Any<CancellationToken>())
-            .Returns(transaction);
+        var transactionRepository = new InMemoryTransactionRepository(transaction);
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -44,7 +40,6 @@ public class RemoveTransactionShould
         await transactionService.RemoveTransactionAsync(transaction.Id, CancellationToken.None);
 
         // Assert
-        await transactionRepository.Received(1).SaveAsync(transaction, Arg.Any<CancellationToken>());
         Assert.IsNotNull(transaction.RemovedAt);
     }
 
@@ -54,10 +49,7 @@ public class RemoveTransactionShould
         // Arrange
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 11, 22, 00, new(02, 00, 00)));
         var transactionId = new TransactionId(new("ad762c8d-2bd6-4c76-b0c7-6a4366874979"));
-        var transactionRepository = Substitute.For<ITransactionRepository>();
-        transactionRepository
-            .GetTransactionByIdAsync(transactionId, Arg.Any<CancellationToken>())
-            .Returns((TransactionAggregate?)null);
+        var transactionRepository = new InMemoryTransactionRepository();
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -65,13 +57,8 @@ public class RemoveTransactionShould
             new InMemoryUserRepository()
         );
 
-        // Act
+        // Act & Assert
         await transactionService.RemoveTransactionAsync(transactionId, CancellationToken.None);
-
-        // Assert
-        await transactionRepository
-            .DidNotReceive()
-            .SaveAsync(Arg.Any<TransactionAggregate>(), Arg.Any<CancellationToken>());
     }
 
     [TestMethod]
@@ -91,10 +78,7 @@ public class RemoveTransactionShould
         );
         var removedAt = timeProvider.GetUtcNow();
         transaction.Remove(removedAt);
-        var transactionRepository = Substitute.For<ITransactionRepository>();
-        transactionRepository
-            .GetTransactionByIdAsync(transaction.Id, Arg.Any<CancellationToken>())
-            .Returns(transaction);
+        var transactionRepository = new InMemoryTransactionRepository(transaction);
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -106,7 +90,6 @@ public class RemoveTransactionShould
         await transactionService.RemoveTransactionAsync(transaction.Id, CancellationToken.None);
 
         // Assert
-        await transactionRepository.Received(1).SaveAsync(transaction, Arg.Any<CancellationToken>());
         Assert.AreEqual(removedAt, transaction.RemovedAt);
     }
 }

@@ -7,9 +7,12 @@ using Split.Domain.Transaction;
 
 namespace Split.Domain.Tests.TestCommon;
 
-public class InMemoryTransactionRepository : ITransactionRepository
+public class InMemoryTransactionRepository(params IEnumerable<TransactionAggregate> transactions)
+    : ITransactionRepository
 {
-    private readonly Dictionary<TransactionId, TransactionAggregate> transactions = [];
+    private readonly Dictionary<TransactionId, TransactionAggregate> transactions = transactions.ToDictionary(
+        transaction => transaction.Id
+    );
 
     public Task<TransactionAggregate?> GetTransactionByIdAsync(
         TransactionId transactionId,

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Split.Domain.Primitives;
+using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 
 namespace Split.Domain.Tests.User.UserServiceTests;
@@ -27,9 +27,7 @@ public class RemoveFriendshipShould
 
         userA.CreateFriendship(userB, timeProvider.GetUtcNow());
 
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(userA.Id, Arg.Any<CancellationToken>()).Returns(userA);
-        userRepository.GetUserByIdAsync(userB.Id, Arg.Any<CancellationToken>()).Returns(userB);
+        var userRepository = new InMemoryUserRepository(userA, userB);
         var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act
@@ -51,9 +49,7 @@ public class RemoveFriendshipShould
         var userA = new UserAggregate(new("UserA"), "User A", new("0123456789"), timeProvider.GetUtcNow());
         var userB = new UserAggregate(new("UserB"), "User B", new("9876543210"), timeProvider.GetUtcNow());
 
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(userA.Id, Arg.Any<CancellationToken>()).Returns(userA);
-        userRepository.GetUserByIdAsync(userB.Id, Arg.Any<CancellationToken>()).Returns(userB);
+        var userRepository = new InMemoryUserRepository(userA, userB);
         var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act
@@ -78,9 +74,7 @@ public class RemoveFriendshipShould
         userA.CreateFriendship(userB, timeProvider.GetUtcNow());
         userA.RemoveFriendship(userB, timeProvider.GetUtcNow());
 
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(userA.Id, Arg.Any<CancellationToken>()).Returns(userA);
-        userRepository.GetUserByIdAsync(userB.Id, Arg.Any<CancellationToken>()).Returns(userB);
+        var userRepository = new InMemoryUserRepository(userA, userB);
         var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act
@@ -102,9 +96,7 @@ public class RemoveFriendshipShould
         var userA = new UserAggregate(new("UserA"), "User A", new("0123456789"), timeProvider.GetUtcNow());
         var userBId = new UserId("UserB");
 
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(userA.Id, Arg.Any<CancellationToken>()).Returns(userA);
-        userRepository.GetUserByIdAsync(userBId, Arg.Any<CancellationToken>()).Returns(null as UserAggregate);
+        var userRepository = new InMemoryUserRepository(userA);
         var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
 
         // Act & Assert

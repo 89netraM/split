@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
+using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 
@@ -27,9 +27,7 @@ public class RemoveFriendshipRequestTests
 
         userA.CreateFriendship(userB, timeProvider.GetUtcNow());
 
-        var userRepository = Substitute.For<IUserRepository>();
-        userRepository.GetUserByIdAsync(userA.Id, Arg.Any<CancellationToken>()).Returns(userA);
-        userRepository.GetUserByIdAsync(userB.Id, Arg.Any<CancellationToken>()).Returns(userB);
+        var userRepository = new InMemoryUserRepository(userA, userB);
         var removeFriendshipRequestHandler = new RemoveFriendshipRequestHandler(
             new UserService(new NullLogger<UserService>(), timeProvider, userRepository)
         );

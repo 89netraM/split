@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
 using Split.Domain.Transaction.Events;
@@ -21,7 +20,7 @@ public class HandleShould
             new TransactionService(
                 new NullLogger<TransactionService>(),
                 new FakeTimeProvider(),
-                Substitute.For<ITransactionRepository>(),
+                new InMemoryTransactionRepository(),
                 new InMemoryUserRepository()
             )
         );

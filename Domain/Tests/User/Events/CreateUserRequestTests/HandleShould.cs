@@ -1,10 +1,10 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Split.Domain.Primitives;
+using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 
@@ -18,11 +18,7 @@ public class HandleShould
     {
         // Arrange
         var handler = new CreateUserRequestHandler(
-            new UserService(
-                Substitute.For<ILogger<UserService>>(),
-                new FakeTimeProvider(),
-                Substitute.For<IUserRepository>()
-            )
+            new UserService(new NullLogger<UserService>(), new FakeTimeProvider(), new InMemoryUserRepository())
         );
         var request = new CreateUserRequest(
             new("1e2d19e5-d92d-42da-a927-4686d3542453"),
