@@ -45,7 +45,12 @@ public class HandleShould
         await repository.SaveAsync(transaction2, CancellationToken.None);
 
         var balanceQueryHandler = new BalanceQueryHandler(
-            new TransactionService(new NullLogger<TransactionService>(), timeProvider, repository)
+            new TransactionService(
+                new NullLogger<TransactionService>(),
+                timeProvider,
+                repository,
+                new InMemoryUserRepository()
+            )
         );
 
         // Act

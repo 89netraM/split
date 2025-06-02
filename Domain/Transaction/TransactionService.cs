@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Split.Domain.Primitives;
+using Split.Domain.User;
 using Split.Utilities;
 
 namespace Split.Domain.Transaction;
@@ -14,7 +14,8 @@ namespace Split.Domain.Transaction;
 public class TransactionService(
     ILogger<TransactionService> logger,
     TimeProvider timeProvider,
-    ITransactionRepository transactionRepository
+    ITransactionRepository transactionRepository,
+    IUserRepository userRepository
 )
 {
     public async Task<TransactionAggregate> CreateTransactionAsync(
@@ -32,6 +33,17 @@ public class TransactionService(
             senderId,
             recipientIds
         );
+
+        var sender =
+            await userRepository.GetUserByIdAsync(senderId, cancellationToken)
+            ?? throw new SenderNotFoundException(senderId);
+        if (
+            recipientIds.Except([senderId, .. sender.Friendships.Select(friend => friend.FriendId)]) is
+            { Count: > 0 } notFriends
+        )
+        {
+            throw new SendingToNonFriendsException(sender.Id, notFriends);
+        }
 
         var transaction = new TransactionAggregate(
             description,
@@ -122,3 +134,10 @@ public class TransactionService(
         logger.LogDebug("Successfully removed transaction with ID: {TransactionId}", transactionId);
     }
 }
+
+public class SenderNotFoundException(UserId senderId) : Exception($"A user with this id {senderId} does not exist");
+
+public class SendingToNonFriendsException(UserId sender, IEnumerable<UserId> missingRecipients)
+    : Exception(
+        $"Sender {sender} is not friends with the following recipients: {string.Join(", ", missingRecipients)}"
+    );

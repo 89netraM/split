@@ -6,6 +6,7 @@ using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Split.Domain.Primitives;
+using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
 
 namespace Split.Domain.Tests.Transaction.TransactionServiceTests;
@@ -35,7 +36,8 @@ public class RemoveTransactionShould
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
-            transactionRepository
+            transactionRepository,
+            new InMemoryUserRepository()
         );
 
         // Act
@@ -59,7 +61,8 @@ public class RemoveTransactionShould
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
-            transactionRepository
+            transactionRepository,
+            new InMemoryUserRepository()
         );
 
         // Act
@@ -95,7 +98,8 @@ public class RemoveTransactionShould
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
-            transactionRepository
+            transactionRepository,
+            new InMemoryUserRepository()
         );
 
         // Act

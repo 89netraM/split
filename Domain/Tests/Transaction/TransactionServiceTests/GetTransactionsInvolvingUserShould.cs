@@ -42,7 +42,12 @@ public class GetTransactionsInvolvingUserShould
         await repository.SaveAsync(transaction1, CancellationToken.None);
         await repository.SaveAsync(transaction2, CancellationToken.None);
 
-        var transactionService = new TransactionService(new NullLogger<TransactionService>(), timeProvider, repository);
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
 
         // Act
         var result = await transactionService
@@ -84,7 +89,12 @@ public class GetTransactionsInvolvingUserShould
         await repository.SaveAsync(transaction, CancellationToken.None);
         await repository.SaveAsync(removedTransaction, CancellationToken.None);
 
-        var transactionService = new TransactionService(new NullLogger<TransactionService>(), timeProvider, repository);
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
 
         // Act
         var result = await transactionService
@@ -124,7 +134,12 @@ public class GetTransactionsInvolvingUserShould
         await repository.SaveAsync(transaction, CancellationToken.None);
         await repository.SaveAsync(unrelatedTransaction, CancellationToken.None);
 
-        var transactionService = new TransactionService(new NullLogger<TransactionService>(), timeProvider, repository);
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
 
         // Act
         var result = await transactionService

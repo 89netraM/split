@@ -48,6 +48,14 @@
       "Split.Domain.Primitives": {
         "type": "Project"
       },
+      "Split.Domain.User": {
+        "type": "Project",
+        "dependencies": {
+          "Mediator.Abstractions": "[3.0.0-preview.65, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[9.0.5, )",
+          "Split.Domain.Primitives": "[1.0.0, )"
+        }
+      },
       "Split.Utilities": {
         "type": "Project"
       }

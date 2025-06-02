@@ -43,7 +43,12 @@ public class HandleShould
         await repository.SaveAsync(transaction1, CancellationToken.None);
         await repository.SaveAsync(transaction2, CancellationToken.None);
 
-        var transactionService = new TransactionService(new NullLogger<TransactionService>(), timeProvider, repository);
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
 
         var handler = new UserTransactionsRequestHandler(transactionService);
 
