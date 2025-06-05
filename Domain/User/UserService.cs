@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -81,6 +83,37 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
             initiator.Id,
             target.Id
         );
+    }
+
+    public async IAsyncEnumerable<UserAggregate> GetFriendsAsync(
+        UserId userId,
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
+    {
+        logger.LogDebug("Retrieving friends for user with ID: {UserId}", userId);
+
+        var user = await userRepository.GetUserByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            logger.LogDebug("Cannot retrieve friends for user ({UserId}) that does not exist", userId);
+            yield break;
+        }
+
+        foreach (var friendship in user.Friendships)
+        {
+            var friend = await userRepository.GetUserByIdAsync(friendship.FriendId, cancellationToken);
+            if (friend is null)
+            {
+                logger.LogError(
+                    "Friendship with ID: {FriendId} for user {UserId} does not have a corresponding user",
+                    friendship.FriendId,
+                    userId
+                );
+                continue;
+            }
+
+            yield return friend;
+        }
     }
 
     public async Task RemoveFriendshipAsync(UserId initiatorId, UserId targetId, CancellationToken cancellationToken)
