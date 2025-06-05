@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Mediator;
 using Split.Domain.Primitives;
 using Split.Domain.User.Events;
@@ -18,8 +19,7 @@ public class UserAggregate
     public IEnumerable<Friendship> Friendships => friendships.Where(f => !f.RemovedAt.HasValue);
     private readonly List<Friendship> friendships = [];
 
-    public IReadOnlyCollection<INotification> DomainEvents => domainEvents;
-    private readonly List<INotification> domainEvents = [];
+    private List<INotification> domainEvents = [];
 
     public UserAggregate(UserId id, string name, PhoneNumber phoneNumber, DateTimeOffset createdAt)
     {
@@ -78,6 +78,13 @@ public class UserAggregate
         };
 
         domainEvents.Add(new FriendshipRemovedEvent(this, friend));
+    }
+
+    public IReadOnlyCollection<INotification> FlushDomainEvents()
+    {
+        var events = domainEvents;
+        domainEvents = [];
+        return events;
     }
 }
 

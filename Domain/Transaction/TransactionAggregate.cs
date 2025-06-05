@@ -17,8 +17,7 @@ public class TransactionAggregate
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? RemovedAt { get; set; }
 
-    public IReadOnlyCollection<INotification> DomainEvents => domainEvents;
-    private readonly List<INotification> domainEvents = [];
+    private List<INotification> domainEvents = [];
 
     public TransactionAggregate(
         string? description,
@@ -47,5 +46,12 @@ public class TransactionAggregate
 
         RemovedAt = removedAt;
         domainEvents.Add(new TransactionRemovedEvent(this));
+    }
+
+    public IReadOnlyCollection<INotification> FlushDomainEvents()
+    {
+        var events = domainEvents;
+        domainEvents = [];
+        return events;
     }
 }

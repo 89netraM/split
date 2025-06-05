@@ -33,6 +33,7 @@ public class InMemoryTransactionRepository(params IEnumerable<TransactionAggrega
     public Task SaveAsync(TransactionAggregate transaction, CancellationToken cancellationToken)
     {
         transactions[transaction.Id] = transaction;
+        _ = transaction.FlushDomainEvents();
         return Task.CompletedTask;
     }
 }

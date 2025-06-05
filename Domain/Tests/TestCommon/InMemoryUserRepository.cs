@@ -20,6 +20,7 @@ public class InMemoryUserRepository(params IEnumerable<UserAggregate> users) : I
     public Task SaveAsync(UserAggregate user, CancellationToken cancellationToken)
     {
         users[user.Id] = user;
+        _ = user.FlushDomainEvents();
         return Task.CompletedTask;
     }
 }
