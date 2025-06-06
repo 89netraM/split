@@ -1,16 +1,31 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Split.Application.Web.Auth;
 using Split.Application.Web.Components;
+using Split.Domain.Tests.TestCommon;
+using Split.Domain.Transaction;
+using Split.Domain.User;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.Services.AddGitHubAuthentication();
+builder.Services.AddGitHubAuthentication().AddIsUserAuthorization();
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+builder
+    .Services.AddSingleton(TimeProvider.System)
+    .AddSingleton<UserService>()
+    .AddSingleton<IUserRepository, InMemoryUserRepository>()
+    .AddSingleton<TransactionService>()
+    .AddSingleton<ITransactionRepository, InMemoryTransactionRepository>();
+
+builder.Services.AddMediator();
 
 var app = builder.Build();
 
@@ -23,9 +38,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAntiforgery();
-
 app.UseAuthentication().UseAuthorization();
+
+app.UseAntiforgery();
 
 app.MapStaticAssets();
 

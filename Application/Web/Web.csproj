@@ -7,5 +7,15 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Domain\Transaction\Transaction.csproj" />
+    <ProjectReference Include="..\..\Domain\User\User.csproj" />
+    <ProjectReference Include="..\..\Domain\Tests\Transaction\Transaction.csproj" />
+    <ProjectReference Include="..\..\Domain\Tests\User\User.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mediator.SourceGenerator">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

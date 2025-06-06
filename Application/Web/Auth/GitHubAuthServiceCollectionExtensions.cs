@@ -20,7 +20,10 @@ public static class GitHubAuthServiceCollectionExtensions
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = "GitHub";
             })
-            .AddCookie()
+            .AddCookie(options =>
+            {
+                options.AccessDeniedPath = "/auth/access-denied";
+            })
             .AddOAuth(
                 "GitHub",
                 options =>
@@ -32,6 +35,7 @@ public static class GitHubAuthServiceCollectionExtensions
                     options.UserInformationEndpoint = "https://api.github.com/user";
 
                     options.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                    options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
 
                     options.SaveTokens = true;
 
