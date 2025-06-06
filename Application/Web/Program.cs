@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Split.Application.Web.Auth;
 using Split.Application.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
-// Add services to the container.
-builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddGitHubAuthentication();
 
-builder.Services.AddOutputCache();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
 var app = builder.Build();
 
@@ -26,7 +25,7 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
-app.UseOutputCache();
+app.UseAuthentication().UseAuthorization();
 
 app.MapStaticAssets();
 

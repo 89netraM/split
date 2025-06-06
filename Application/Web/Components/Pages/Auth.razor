@@ -1,0 +1,12 @@
+﻿@page "/auth/{provider}"
+
+<h1>Unauthenticated</h1>
+
+<p>Could not sign your in</p>
+
+<p>Return to <NavLink href="/">home</NavLink></p>
+
+@code {
+    [Parameter]
+    public required string Provider { get; init; }
+}
