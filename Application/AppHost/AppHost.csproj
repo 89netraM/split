@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Sdk Name="Aspire.AppHost.Sdk" />
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>7ff9e356-618d-48f6-83cc-3f920697ea5d</UserSecretsId>
+    <RootNamespace>Split.Application.AppHost</RootNamespace>
+    <AssemblyName>Split.Application.AppHost</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Web\Web.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+  </ItemGroup>
+</Project>

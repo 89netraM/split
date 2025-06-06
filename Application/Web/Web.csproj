@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>1a12c44b-1b7b-40c5-afb8-2e8f598ee809</UserSecretsId>
+    <RootNamespace>Split.Application.Web</RootNamespace>
+    <AssemblyName>Split.Application.Web</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

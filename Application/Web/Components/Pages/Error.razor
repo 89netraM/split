@@ -1,0 +1,28 @@
+﻿@page "/Error"
+@using System.Diagnostics
+@using Microsoft.AspNetCore.Http
+
+<PageTitle>Error</PageTitle>
+
+<h1>Error.</h1>
+<h2>An error occurred while processing your request.</h2>
+
+@if (ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@requestId</code>
+    </p>
+}
+
+@code{
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    private string? requestId;
+    private bool ShowRequestId => !string.IsNullOrEmpty(requestId);
+
+    protected override void OnInitialized()
+    {
+        requestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+    }
+}
