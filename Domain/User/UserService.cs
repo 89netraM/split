@@ -45,6 +45,26 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
         return newUser;
     }
 
+    public async Task<UserAggregate?> GetUserAsync(UserId userId, CancellationToken cancellationToken)
+    {
+        logger.LogDebug("Retrieving user with ID: {UserId}", userId);
+
+        var user = await userRepository.GetUserByIdAsync(userId, cancellationToken);
+        if (user is null)
+        {
+            logger.LogDebug("User with ID: {UserId} does not exist", userId);
+            return null;
+        }
+        if (user.RemovedAt.HasValue)
+        {
+            logger.LogDebug("User with ID: {UserId} has been removed", userId);
+            return null;
+        }
+
+        logger.LogDebug("Successfully retrieved user with ID: {UserId}", user.Id);
+        return user;
+    }
+
     public async Task RemoveUserAsync(UserId userId, CancellationToken cancellationToken)
     {
         logger.LogDebug("Removing user with ID: {UserId}", userId);
