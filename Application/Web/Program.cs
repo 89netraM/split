@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Split.Application.Web.Auth;
 using Split.Application.Web.Components;
+using Split.Application.Web.Services;
 using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
 using Split.Domain.User;
@@ -17,6 +18,8 @@ builder.Services.AddGitHubAuthentication().AddIsUserAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+builder.Services.AddFriendshipCodeService();
 
 builder
     .Services.AddSingleton(TimeProvider.System)
