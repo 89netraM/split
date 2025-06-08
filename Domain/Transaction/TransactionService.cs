@@ -34,15 +34,19 @@ public class TransactionService(
             recipientIds
         );
 
-        var sender =
-            await userRepository.GetUserByIdAsync(senderId, cancellationToken)
-            ?? throw new SenderNotFoundException(senderId);
-        if (
-            recipientIds.Except([senderId, .. sender.Friendships.Select(friend => friend.FriendId)]) is
-            { Count: > 0 } notFriends
-        )
+        if (await userRepository.GetUserByIdAsync(senderId, cancellationToken) is null)
         {
-            throw new SendingToNonFriendsException(sender.Id, notFriends);
+            throw new SenderNotFoundException(senderId);
+        }
+        var missingRecipients = await recipientIds
+            .ToAsyncEnumerable()
+            .WhereAwait(async recipientId =>
+                await userRepository.GetUserByIdAsync(recipientId, cancellationToken) is null
+            )
+            .ToArrayAsync(cancellationToken);
+        if (missingRecipients is not [])
+        {
+            throw new RecipientsNotFoundException(missingRecipients);
         }
 
         var transaction = new TransactionAggregate(
@@ -135,9 +139,7 @@ public class TransactionService(
     }
 }
 
-public class SenderNotFoundException(UserId senderId) : Exception($"A user with this id {senderId} does not exist");
+public class SenderNotFoundException(UserId senderId) : Exception($"A user with the id {senderId} does not exist");
 
-public class SendingToNonFriendsException(UserId sender, IEnumerable<UserId> missingRecipients)
-    : Exception(
-        $"Sender {sender} is not friends with the following recipients: {string.Join(", ", missingRecipients)}"
-    );
+public class RecipientsNotFoundException(UserId[] recipientIds)
+    : Exception($"Users with ids {string.Join(", ", recipientIds.Select(id => id.Value))} does not exist");

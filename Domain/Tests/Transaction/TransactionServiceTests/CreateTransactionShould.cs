@@ -33,7 +33,6 @@ public class CreateTransactionShould
             new("9876543210"),
             timeProvider.GetUtcNow()
         );
-        sender.CreateFriendship(recipient, timeProvider.GetUtcNow());
 
         var userRepository = new InMemoryUserRepository(sender, recipient);
         var recipientIds = new NonEmptyImmutableSet<UserId>(sender.Id, recipient.Id);
@@ -106,7 +105,7 @@ public class CreateTransactionShould
     }
 
     [TestMethod]
-    public async Task ThrowAnException_WhenTheSenderIsNotFriendsWithAllOfTheRecipients()
+    public async Task ThrowAnException_WhenARecipientDoesNotExist()
     {
         // Arrange
         var timeProvider = new FakeTimeProvider(new(2025, 06, 02, 20, 12, 00, new(02, 00, 00)))
@@ -117,15 +116,10 @@ public class CreateTransactionShould
         var amount = new Money(250, new("SEK"));
         var description = "Lunch";
         var sender = new UserAggregate(new("user-sender"), "Sender", new("0123456789"), timeProvider.GetUtcNow());
-        var recipient = new UserAggregate(
-            new("user-recipient"),
-            "Recipient",
-            new("9876543210"),
-            timeProvider.GetUtcNow()
-        );
+        var recipientId = new UserId("user-recipient");
 
-        var userRepository = new InMemoryUserRepository(sender, recipient);
-        var recipientIds = new NonEmptyImmutableSet<UserId>(sender.Id, recipient.Id);
+        var userRepository = new InMemoryUserRepository(sender);
+        var recipientIds = new NonEmptyImmutableSet<UserId>(sender.Id, recipientId);
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -144,6 +138,6 @@ public class CreateTransactionShould
             );
 
         // Assert
-        await Assert.ThrowsExceptionAsync<SendingToNonFriendsException>(action);
+        await Assert.ThrowsExceptionAsync<RecipientsNotFoundException>(action);
     }
 }

@@ -18,11 +18,5 @@
     <Project Path="Domain/Tests/TestCommon/TestCommon.csproj" />
     <Project Path="Domain/Tests/Transaction/Transaction.csproj" />
   </Folder>
-  <Folder Name="/Infrastructure/">
-    <Project Path="Infrastructure/EncryptedRequests/EncryptedRequests.csproj" />
-  </Folder>
-  <Folder Name="/Infrastructure/Tests/">
-    <Project Path="Infrastructure/Tests/EncryptedRequests/EncryptedRequests.csproj" />
-  </Folder>
   <Project Path="Utilities/Utilities.csproj" />
 </Solution>

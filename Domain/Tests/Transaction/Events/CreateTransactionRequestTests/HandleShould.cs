@@ -34,7 +34,6 @@ public class HandleShould
             new("9876543210"),
             timeProvider.GetUtcNow()
         );
-        sender.CreateFriendship(recipient, timeProvider.GetUtcNow());
 
         var userRepository = new InMemoryUserRepository(sender, recipient);
         var recipientIds = new NonEmptyImmutableSet<UserId>(sender.Id, recipient.Id);
