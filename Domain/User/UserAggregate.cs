@@ -25,6 +25,12 @@ public class UserAggregate
         domainEvents.Add(new UserCreatedEvent(this));
     }
 
+#nullable disable
+    [Obsolete("For EF Core only", error: true)]
+    public UserAggregate() { }
+
+#nullable restore
+
     public void Remove(DateTimeOffset removedAt)
     {
         if (RemovedAt.HasValue)

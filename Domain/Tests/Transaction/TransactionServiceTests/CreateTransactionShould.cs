@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -35,7 +36,7 @@ public class CreateTransactionShould
         );
 
         var userRepository = new InMemoryUserRepository(sender, recipient);
-        var recipientIds = new NonEmptyImmutableSet<UserId>(sender.Id, recipient.Id);
+        var recipientIds = new NonEmptyList<UserId>(sender.Id, recipient.Id);
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -57,7 +58,7 @@ public class CreateTransactionShould
         Assert.AreEqual(amount, transaction.Amount);
         Assert.AreEqual(description, transaction.Description);
         Assert.AreEqual(sender.Id, transaction.SenderId);
-        Assert.IsTrue(recipientIds.SetEquals(transaction.RecipientIds));
+        Assert.IsTrue(recipientIds.ToHashSet().SetEquals(transaction.RecipientIds));
         Assert.IsTrue(transaction.CreatedAt < timeProvider.GetUtcNow(), "CreatedAt should be in the past");
         Assert.IsNull(transaction.RemovedAt);
     }
@@ -82,7 +83,7 @@ public class CreateTransactionShould
         );
 
         var userRepository = new InMemoryUserRepository(recipient);
-        var recipientIds = new NonEmptyImmutableSet<UserId>(senderId, recipient.Id);
+        var recipientIds = new NonEmptyList<UserId>(senderId, recipient.Id);
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -119,7 +120,7 @@ public class CreateTransactionShould
         var recipientId = new UserId("user-recipient");
 
         var userRepository = new InMemoryUserRepository(sender);
-        var recipientIds = new NonEmptyImmutableSet<UserId>(sender.Id, recipientId);
+        var recipientIds = new NonEmptyList<UserId>(sender.Id, recipientId);
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,

@@ -10,7 +10,7 @@ public record CreateTransactionRequest(
     Money Amount,
     string? Description,
     UserId SenderId,
-    NonEmptyImmutableSet<UserId> RecipientIds
+    NonEmptyList<UserId> RecipientIds
 ) : IRequest<CreateTransactionResponse>;
 
 public record CreateTransactionResponse(TransactionAggregate Transaction);

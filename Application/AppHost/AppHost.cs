@@ -2,6 +2,14 @@ using Aspire.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Web>("frontend").WithExternalHttpEndpoints().WithHttpHealthCheck("/health");
+var postgres = builder.AddPostgres("postgres").WithPgAdmin();
+var database = postgres.AddDatabase("database");
+
+builder
+    .AddProject<Projects.Web>("frontend")
+    .WithReference(database)
+    .WaitFor(database)
+    .WithExternalHttpEndpoints()
+    .WithHttpHealthCheck("/health");
 
 builder.Build().Run();

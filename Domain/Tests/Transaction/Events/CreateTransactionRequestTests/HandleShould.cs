@@ -36,7 +36,7 @@ public class HandleShould
         );
 
         var userRepository = new InMemoryUserRepository(sender, recipient);
-        var recipientIds = new NonEmptyImmutableSet<UserId>(sender.Id, recipient.Id);
+        var recipientIds = new NonEmptyList<UserId>(sender.Id, recipient.Id);
         var handler = new CreateTransactionRequestHandler(
             new TransactionService(
                 new NullLogger<TransactionService>(),

@@ -13,7 +13,7 @@ public class TransactionAggregate
     public string? Description { get; }
     public Money Amount { get; }
     public UserId SenderId { get; }
-    public NonEmptyImmutableSet<UserId> RecipientIds { get; }
+    public NonEmptyList<UserId> RecipientIds { get; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? RemovedAt { get; set; }
 
@@ -23,7 +23,7 @@ public class TransactionAggregate
         string? description,
         Money amount,
         UserId senderId,
-        NonEmptyImmutableSet<UserId> recipientIds,
+        NonEmptyList<UserId> recipientIds,
         DateTimeOffset createdAt
     )
     {
@@ -36,6 +36,12 @@ public class TransactionAggregate
 
         domainEvents.Add(new TransactionCreatedEvent(this));
     }
+
+#nullable disable
+    [Obsolete("For EF Core only", error: true)]
+    public TransactionAggregate() { }
+
+#nullable restore
 
     public void Remove(DateTimeOffset removedAt)
     {

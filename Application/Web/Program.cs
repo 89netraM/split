@@ -4,13 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Split.Application.Web.Auth;
 using Split.Application.Web.Components;
-using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
 using Split.Domain.User;
+using Split.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
+builder.Services.AddRepositories();
 
 builder.Services.AddGitHubAuthentication().AddIsUserAuthorization();
 
@@ -18,14 +20,9 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-builder
-    .Services.AddSingleton(TimeProvider.System)
-    .AddSingleton<UserService>()
-    .AddSingleton<IUserRepository, InMemoryUserRepository>()
-    .AddSingleton<TransactionService>()
-    .AddSingleton<ITransactionRepository, InMemoryTransactionRepository>();
+builder.Services.AddSingleton(TimeProvider.System).AddScoped<UserService>().AddScoped<TransactionService>();
 
-builder.Services.AddMediator();
+builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

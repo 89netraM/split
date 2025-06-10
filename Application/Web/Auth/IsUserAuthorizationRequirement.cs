@@ -50,7 +50,7 @@ public static class IsUserAuthorizationServiceCollectionExtensions
     public static IServiceCollection AddIsUserAuthorization(this IServiceCollection services)
     {
         services
-            .AddSingleton<IAuthorizationHandler, IsUserAuthorizationHandler>()
+            .AddScoped<IAuthorizationHandler, IsUserAuthorizationHandler>()
             .AddAuthorizationBuilder()
             .AddDefaultPolicy(
                 "IsUserPolicy",

@@ -22,7 +22,7 @@ public class TransactionService(
         Money amount,
         string? description,
         UserId senderId,
-        NonEmptyImmutableSet<UserId> recipientIds,
+        NonEmptyList<UserId> recipientIds,
         CancellationToken cancellationToken
     )
     {
