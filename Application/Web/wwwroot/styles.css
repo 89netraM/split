@@ -58,10 +58,12 @@ nav {
         }
 
         &:first-child {
-            border-radius: 0.75rem 0 0 0.75rem;
+            border-start-start-radius: 0.75rem;
+            border-end-start-radius: 0.75rem;
         }
         &:last-child {
-            border-radius: 0 0.75rem 0.75rem 0;
+            border-start-end-radius: 0.75rem;
+            border-end-end-radius: 0.75rem;
         }
     }
 }
