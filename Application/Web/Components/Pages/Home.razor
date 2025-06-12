@@ -2,4 +2,13 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Split</h1>
+<div>
+    <AuthorizeView>
+        <Authorized>
+            <NavLink>Create transaction</NavLink>
+        </Authorized>
+        <NotAuthorized>
+            <NavLink href="/signin">Signing or create account</NavLink>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>

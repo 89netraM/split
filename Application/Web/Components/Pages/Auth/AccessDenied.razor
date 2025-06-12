@@ -9,27 +9,29 @@
 @inject IMediator mediator
 @inject NavigationManager navigationManager
 
-<h1>Create an Account</h1>
+<div>
+    <h1>Create an Account</h1>
 
-<EditForm Model="Model" FormName="CreateAccountForm" OnValidSubmit="ValidSubmitHandler">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <p>
-        <label>
-            Name:
-            <InputText @bind-Value="Model!.Name" />
-        </label>
-    </p>
-    <p>
-        <label>
-            Phone number:
-            <InputText @bind-Value="Model!.PhoneNumber" />
-        </label>
-    </p>
-    <p>
-        <button type="submit">Create Account</button>
-    </p>
-</EditForm>
+    <EditForm Model="Model" FormName="CreateAccountForm" OnValidSubmit="ValidSubmitHandler">
+        <DataAnnotationsValidator />
+        <p>
+            <label>
+                <span>Name</span>
+                <InputText @bind-Value="Model!.Name" required />
+            </label>
+        </p>
+        <p>
+            <label>
+                <span>Phone number</span>
+                <InputText @bind-Value="Model!.PhoneNumber" required />
+            </label>
+        </p>
+        <ValidationSummary />
+        <p>
+            <button type="submit">Create Account</button>
+        </p>
+    </EditForm>
+</div>
 
 @code {
     [SupplyParameterFromForm]
@@ -67,10 +69,12 @@
 
     public record UserInformation
     {
-        [Required, RegularExpression(@".*\S.*")]
+        [Required(ErrorMessage = "Name is required.")]
+        [RegularExpression(@".*\S.*", ErrorMessage = "Name is required and cannot be just whitespace.")]
         public string? Name { get; set; }
 
-        [Required, RegularExpression(@"^\+?\d+$")]
+        [Required(ErrorMessage = "Phone number is required.")]
+        [RegularExpression(@"^\+\d+$", ErrorMessage = "Phone number must start with a '+' followed by only digits.")]
         public string? PhoneNumber { get; set; }
     }
 }
