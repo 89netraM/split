@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -33,7 +31,8 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
             }
         }
 
-        if (await userRepository.IsPhoneNumberInUse(phoneNumber, cancellationToken))
+        var existingPhoneUser = await userRepository.GetUserByPhoneNumberAsync(phoneNumber, cancellationToken);
+        if (existingPhoneUser is { RemovedAt: null })
         {
             throw new PhoneNumberInUseException(phoneNumber);
         }
@@ -62,6 +61,29 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
         }
 
         logger.LogDebug("Successfully retrieved user with ID: {UserId}", user.Id);
+        return user;
+    }
+
+    public async Task<UserAggregate?> GetUserByPhoneNumberAsync(
+        PhoneNumber phoneNumber,
+        CancellationToken cancellationToken
+    )
+    {
+        logger.LogDebug("Retrieving user with phone number: {PhoneNumber}", phoneNumber);
+
+        var user = await userRepository.GetUserByPhoneNumberAsync(phoneNumber, cancellationToken);
+        if (user is null)
+        {
+            logger.LogDebug("User with phone number: {PhoneNumber} does not exist", phoneNumber);
+            return null;
+        }
+        if (user.RemovedAt.HasValue)
+        {
+            logger.LogDebug("User with phone number: {PhoneNumber} has been removed", phoneNumber);
+            return null;
+        }
+
+        logger.LogDebug("Successfully retrieved user with phone number: {PhoneNumber}", phoneNumber);
         return user;
     }
 

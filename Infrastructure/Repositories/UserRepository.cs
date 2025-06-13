@@ -13,8 +13,10 @@ public class UserRepository(SplitDbContext dbContext, IMediator mediator) : IUse
     public async Task<UserAggregate?> GetUserByIdAsync(UserId userId, CancellationToken cancellationToken) =>
         await dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
-    public async Task<bool> IsPhoneNumberInUse(PhoneNumber phoneNumber, CancellationToken cancellationToken) =>
-        await dbContext.Users.AnyAsync(u => u.PhoneNumber == phoneNumber, cancellationToken);
+    public async Task<UserAggregate?> GetUserByPhoneNumberAsync(
+        PhoneNumber phoneNumber,
+        CancellationToken cancellationToken
+    ) => await dbContext.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber, cancellationToken);
 
     public async Task SaveAsync(UserAggregate user, CancellationToken cancellationToken)
     {

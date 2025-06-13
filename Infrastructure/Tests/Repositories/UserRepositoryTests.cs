@@ -52,7 +52,7 @@ public class UserRepositoryTests : PostgresTestBase
     }
 
     [TestMethod]
-    public async Task ASavedUserShouldBlockItsPhoneNumber()
+    public async Task ASavedUserShouldBeRetrievableByPhoneNumber()
     {
         // Arrange
         var userRepository = Services.GetRequiredService<IUserRepository>();
@@ -65,30 +65,15 @@ public class UserRepositoryTests : PostgresTestBase
 
         // Act
         await userRepository.SaveAsync(user, CancellationToken.None);
-        var result = await userRepository.IsPhoneNumberInUse(user.PhoneNumber, CancellationToken.None);
+        var result = await userRepository.GetUserByPhoneNumberAsync(user.PhoneNumber, CancellationToken.None);
 
         // Assert
-        Assert.IsTrue(result);
-    }
-
-    [TestMethod]
-    public async Task ASavedUserShouldNotBlockAnotherPhoneNumber()
-    {
-        // Arrange
-        var userRepository = Services.GetRequiredService<IUserRepository>();
-        var user = new UserAggregate(
-            new("user-id"),
-            "Test User",
-            new("0123456789"),
-            new(2025, 06, 09, 16, 25, 00, new(00, 00, 00))
-        );
-
-        // Act
-        await userRepository.SaveAsync(user, CancellationToken.None);
-        var result = await userRepository.IsPhoneNumberInUse(new("0987654321"), CancellationToken.None);
-
-        // Assert
-        Assert.IsFalse(result);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(user.Id, result.Id);
+        Assert.AreEqual(user.Name, result.Name);
+        Assert.AreEqual(user.PhoneNumber, result.PhoneNumber);
+        Assert.AreEqual(user.CreatedAt, result.CreatedAt);
+        Assert.AreEqual(user.RemovedAt, result.RemovedAt);
     }
 
     [TestMethod]
