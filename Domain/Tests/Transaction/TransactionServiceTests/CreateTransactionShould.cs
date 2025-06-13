@@ -9,7 +9,6 @@ using Split.Domain.Primitives;
 using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
 using Split.Domain.User;
-using Split.Utilities;
 
 namespace Split.Domain.Tests.Transaction.TransactionServiceTests;
 
@@ -36,7 +35,7 @@ public class CreateTransactionShould
         );
 
         var userRepository = new InMemoryUserRepository(sender, recipient);
-        var recipientIds = new NonEmptyList<UserId>(sender.Id, recipient.Id);
+        UserId[] recipientIds = [sender.Id, recipient.Id];
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -83,7 +82,7 @@ public class CreateTransactionShould
         );
 
         var userRepository = new InMemoryUserRepository(recipient);
-        var recipientIds = new NonEmptyList<UserId>(senderId, recipient.Id);
+        UserId[] recipientIds = [senderId, recipient.Id];
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,
@@ -120,7 +119,7 @@ public class CreateTransactionShould
         var recipientId = new UserId("user-recipient");
 
         var userRepository = new InMemoryUserRepository(sender);
-        var recipientIds = new NonEmptyList<UserId>(sender.Id, recipientId);
+        UserId[] recipientIds = [sender.Id, recipientId];
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),
             timeProvider,

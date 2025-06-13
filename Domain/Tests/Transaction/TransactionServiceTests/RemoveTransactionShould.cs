@@ -25,7 +25,7 @@ public class RemoveTransactionShould
             "Test Transaction",
             new(100, new("SEK")),
             new("1c9dfcc8-c06a-4e06-b44e-69bb05741bdc"),
-            new(new("52710472-f392-4d1a-9a5c-727bc365346a")),
+            [new("52710472-f392-4d1a-9a5c-727bc365346a")],
             timeProvider.GetUtcNow()
         );
         var transactionRepository = new InMemoryTransactionRepository(transaction);
@@ -73,7 +73,7 @@ public class RemoveTransactionShould
             "Test Transaction",
             new(100, new("SEK")),
             new("d6506d23-18ea-4c19-9817-898d24e3cedb"),
-            new(new("2d2a7bdd-160e-42c0-bb9b-1785c4a8937e")),
+            [new("2d2a7bdd-160e-42c0-bb9b-1785c4a8937e")],
             timeProvider.GetUtcNow()
         );
         var removedAt = timeProvider.GetUtcNow();

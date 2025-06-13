@@ -481,7 +481,6 @@
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.5, )",
           "Split.Domain.Primitives": "[1.0.0, )",
           "Split.Domain.User": "[1.0.0, )",
-          "Split.Utilities": "[1.0.0, )",
           "System.Linq.Async": "[6.0.1, )"
         }
       },
@@ -493,9 +492,6 @@
           "Split.Domain.Primitives": "[1.0.0, )",
           "System.Linq.Async": "[6.0.1, )"
         }
-      },
-      "Split.Utilities": {
-        "type": "Project"
       },
       "Mediator.Abstractions": {
         "type": "CentralTransitive",

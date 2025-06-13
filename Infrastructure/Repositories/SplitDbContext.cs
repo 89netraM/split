@@ -1,14 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Split.Domain.Primitives;
 using Split.Domain.Transaction;
 using Split.Domain.User;
-using Split.Utilities;
 
 namespace Split.Infrastructure.Repositories;
 
@@ -39,9 +34,6 @@ public class SplitDbContext(DbContextOptions<SplitDbContext> options) : DbContex
         var userBuilder = modelBuilder.Entity<UserAggregate>();
         userBuilder.HasMany<TransactionAggregate>().WithOne().HasForeignKey(t => t.SenderId);
 
-        // var recipientsBuilder = transactionBuilder
-        //     .Property(t => t.RecipientIds)
-        //     .HasConversion<NonEmptyListConverter>();
         var recipientsBuilder = transactionBuilder.PrimitiveCollection(t => t.RecipientIds);
         recipientsBuilder.ElementType().HasConversion<UserIdConverter>();
 

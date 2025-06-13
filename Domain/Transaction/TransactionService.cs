@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Split.Domain.Primitives;
 using Split.Domain.User;
-using Split.Utilities;
 
 namespace Split.Domain.Transaction;
 
@@ -22,7 +21,7 @@ public class TransactionService(
         Money amount,
         string? description,
         UserId senderId,
-        NonEmptyList<UserId> recipientIds,
+        IReadOnlyList<UserId> recipientIds,
         CancellationToken cancellationToken
     )
     {

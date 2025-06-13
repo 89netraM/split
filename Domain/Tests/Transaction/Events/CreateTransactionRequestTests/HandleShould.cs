@@ -9,7 +9,6 @@ using Split.Domain.Tests.TestCommon;
 using Split.Domain.Transaction;
 using Split.Domain.Transaction.Events;
 using Split.Domain.User;
-using Split.Utilities;
 
 namespace Split.Domain.Tests.Transaction.Events.CreateTransactionRequestTests;
 
@@ -36,7 +35,7 @@ public class HandleShould
         );
 
         var userRepository = new InMemoryUserRepository(sender, recipient);
-        var recipientIds = new NonEmptyList<UserId>(sender.Id, recipient.Id);
+        UserId[] recipientIds = [sender.Id, recipient.Id];
         var handler = new CreateTransactionRequestHandler(
             new TransactionService(
                 new NullLogger<TransactionService>(),

@@ -24,5 +24,4 @@
   <Folder Name="/Infrastructure/Tests/">
     <Project Path="Infrastructure/Tests/Repositories/Repositories.csproj" />
   </Folder>
-  <Project Path="Utilities/Utilities.csproj" />
 </Solution>

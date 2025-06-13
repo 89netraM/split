@@ -27,14 +27,14 @@ public class GetTransactionsInvolvingUserShould
             "Test Transaction 1",
             new(100, new("SEK")),
             userId,
-            new(new("user-B")),
+            [new("user-B")],
             timeProvider.GetUtcNow()
         );
         var transaction2 = new TransactionAggregate(
             "Test Transaction 2",
             new(200, new("SEK")),
             new UserId("user-B"),
-            new(userId, new UserId("user-C")),
+            [userId, new("user-C")],
             timeProvider.GetUtcNow()
         );
 
@@ -71,14 +71,14 @@ public class GetTransactionsInvolvingUserShould
             "Test Transaction",
             new(100, new("SEK")),
             userId,
-            new(new("user-B")),
+            [new("user-B")],
             timeProvider.GetUtcNow()
         );
         var removedTransaction = new TransactionAggregate(
             "Removed Transaction",
             new(100, new("SEK")),
             userId,
-            new(new("user-B")),
+            [new("user-B")],
             timeProvider.GetUtcNow()
         );
         removedTransaction.Remove(timeProvider.GetUtcNow());
@@ -115,14 +115,14 @@ public class GetTransactionsInvolvingUserShould
             "Test Transaction",
             new(100, new("SEK")),
             userId,
-            new(new("user-B")),
+            [new("user-B")],
             timeProvider.GetUtcNow()
         );
         var unrelatedTransaction = new TransactionAggregate(
             "Unrelated Transaction",
             new(100, new("SEK")),
             new("user-B"),
-            new(new("user-C")),
+            [new("user-C")],
             timeProvider.GetUtcNow()
         );
 

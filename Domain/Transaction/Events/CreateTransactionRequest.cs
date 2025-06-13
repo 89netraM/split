@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator;
 using Split.Domain.Primitives;
-using Split.Utilities;
 
 namespace Split.Domain.Transaction.Events;
 
@@ -10,7 +10,7 @@ public record CreateTransactionRequest(
     Money Amount,
     string? Description,
     UserId SenderId,
-    NonEmptyList<UserId> RecipientIds
+    IReadOnlyList<UserId> RecipientIds
 ) : IRequest<CreateTransactionResponse>;
 
 public record CreateTransactionResponse(TransactionAggregate Transaction);

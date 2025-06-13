@@ -28,14 +28,14 @@ public class GetBalanceForUserAsync
             "Test Transaction 1",
             new(100, new("SEK")),
             userA,
-            new(userB),
+            [userB],
             timeProvider.GetUtcNow()
         );
         var transaction2 = new TransactionAggregate(
             "Test Transaction 2",
             new(50, new("SEK")),
             userB,
-            new(userA),
+            [userA],
             timeProvider.GetUtcNow()
         );
 
@@ -75,14 +75,14 @@ public class GetBalanceForUserAsync
             "Test Transaction 1",
             new(100, new("SEK")),
             userA,
-            new(userB),
+            [userB],
             timeProvider.GetUtcNow()
         );
         var transaction2 = new TransactionAggregate(
             "Test Transaction 2",
             new(150, new("SEK")),
             userB,
-            new(userA),
+            [userA],
             timeProvider.GetUtcNow()
         );
 
@@ -122,14 +122,14 @@ public class GetBalanceForUserAsync
             "Test Transaction 1",
             new(100, new("SEK")),
             userA,
-            new(userB),
+            [userB],
             timeProvider.GetUtcNow()
         );
         var transaction2 = new TransactionAggregate(
             "Test Transaction 2",
             new(100, new("SEK")),
             userB,
-            new(userA),
+            [userA],
             timeProvider.GetUtcNow()
         );
 
@@ -166,14 +166,14 @@ public class GetBalanceForUserAsync
             "Test Transaction 1",
             new(100, new("SEK")),
             userA,
-            new(userB),
+            [userB],
             timeProvider.GetUtcNow()
         );
         var transaction2 = new TransactionAggregate(
             "Test Transaction 2",
             new(50, new("EUR")),
             userB,
-            new(userA),
+            [userA],
             timeProvider.GetUtcNow()
         );
 
@@ -225,14 +225,14 @@ public class GetBalanceForUserAsync
             "Test Transaction 1",
             new(100, new("SEK")),
             userA,
-            new(userB),
+            [userB],
             timeProvider.GetUtcNow()
         );
         var transaction2 = new TransactionAggregate(
             "Test Transaction 2",
             new(50, new("SEK")),
             userA,
-            new(userC),
+            [userC],
             timeProvider.GetUtcNow()
         );
 
@@ -284,14 +284,14 @@ public class GetBalanceForUserAsync
             "Test Transaction 1",
             new(100, new("SEK")),
             userA,
-            new(userB),
+            [userB],
             timeProvider.GetUtcNow()
         );
         var transaction2 = new TransactionAggregate(
             "Test Transaction 2",
             new(50, new("SEK")),
             userB,
-            new(userC),
+            [userC],
             timeProvider.GetUtcNow()
         );
 

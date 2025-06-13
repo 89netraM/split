@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Mediator;
 using Split.Domain.Primitives;
 using Split.Domain.Transaction.Events;
-using Split.Utilities;
 
 namespace Split.Domain.Transaction;
 
@@ -13,7 +12,7 @@ public class TransactionAggregate
     public string? Description { get; }
     public Money Amount { get; }
     public UserId SenderId { get; }
-    public NonEmptyList<UserId> RecipientIds { get; }
+    public IReadOnlyList<UserId> RecipientIds { get; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? RemovedAt { get; set; }
 
@@ -23,10 +22,15 @@ public class TransactionAggregate
         string? description,
         Money amount,
         UserId senderId,
-        NonEmptyList<UserId> recipientIds,
+        IReadOnlyList<UserId> recipientIds,
         DateTimeOffset createdAt
     )
     {
+        if (recipientIds is [])
+        {
+            throw new NoRecipientsException(nameof(recipientIds));
+        }
+
         Id = new(Guid.NewGuid());
         Description = description;
         Amount = amount;
@@ -61,3 +65,6 @@ public class TransactionAggregate
         return events;
     }
 }
+
+public class NoRecipientsException(string paramName)
+    : ArgumentException("Transaction must have at least one recipient", paramName);

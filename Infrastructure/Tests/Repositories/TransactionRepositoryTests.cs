@@ -63,7 +63,7 @@ public class TransactionRepositoryTests : PostgresTestBase
             "Transaction A",
             new(100m, new("SEK")),
             userA.Id,
-            new(userB.Id),
+            [userB.Id],
             new(2025, 06, 09, 17, 22, 00, new(00, 00, 00))
         );
 
@@ -91,7 +91,7 @@ public class TransactionRepositoryTests : PostgresTestBase
             "Transaction A",
             new(100m, new("SEK")),
             userA.Id,
-            new(userB.Id),
+            [userB.Id],
             new(2025, 06, 09, 17, 22, 00, new(00, 00, 00))
         );
 
@@ -115,7 +115,7 @@ public class TransactionRepositoryTests : PostgresTestBase
             "Transaction A",
             new(100m, new("SEK")),
             userA.Id,
-            new(userB.Id),
+            [userB.Id],
             new(2025, 06, 09, 17, 22, 00, new(00, 00, 00))
         );
 
@@ -139,7 +139,7 @@ public class TransactionRepositoryTests : PostgresTestBase
             "Transaction A",
             new(100m, new("SEK")),
             userA.Id,
-            new(userB.Id),
+            [userB.Id],
             new(2025, 06, 09, 17, 22, 00, new(00, 00, 00))
         );
 
