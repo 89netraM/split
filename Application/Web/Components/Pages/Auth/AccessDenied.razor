@@ -9,7 +9,7 @@
 @inject IMediator mediator
 @inject NavigationManager navigationManager
 
-<div>
+<div class="simple-form">
     <h1>Create an Account</h1>
 
     <EditForm Model="Model" FormName="CreateAccountForm" OnValidSubmit="ValidSubmitHandler">
@@ -17,13 +17,13 @@
         <p>
             <label>
                 <span>Name</span>
-                <InputText @bind-Value="Model!.Name" required />
+                <InputText @bind-Value="Model!.Name" required placeholder />
             </label>
         </p>
         <p>
             <label>
                 <span>Phone number</span>
-                <InputText @bind-Value="Model!.PhoneNumber" required />
+                <InputText @bind-Value="Model!.PhoneNumber" required placeholder />
             </label>
         </p>
         <ValidationSummary />

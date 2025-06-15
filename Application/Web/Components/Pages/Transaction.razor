@@ -1,0 +1,122 @@
+@page "/transaction"
+@using Mediator
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Http
+@using System.ComponentModel.DataAnnotations
+@using Split.Domain.Transaction.Events
+@using System.Security.Claims
+@using Split.Domain.User
+@using Split.Domain.User.Events
+@using System.Diagnostics.CodeAnalysis
+@attribute [Authorize]
+@inject IHttpContextAccessor httpContextAccessor
+@inject IMediator mediator
+
+<div class="simple-form">
+    <h1>New Transaction</h1>
+
+    <EditForm EditContext="@editContext" FormName="NewTransactionForm" OnSubmit="SubmitHandler">
+        <p>
+            <label>
+                <span>Recipient</span>
+                <InputText @bind-Value="@model.Recipient" required placeholder />
+            </label>
+            <ValidationMessage For="@(() => model.Recipient)" />
+        </p>
+        <p>
+            <label>
+                <span>Amount</span>
+                <InputNumber @bind-Value="@model.Amount" required placeholder />
+            </label>
+            <ValidationMessage For="@(() => model.Amount)" />
+        </p>
+        <p>
+            <label>
+                <span>Description</span>
+                <InputText @bind-Value="@model.Description" placeholder />
+            </label>
+            <ValidationMessage For="@(() => model.Description)" />
+        </p>
+        <p>
+            <button type="submit">Send</button>
+        </p>
+    </EditForm>
+</div>
+
+<div id="transaction-completed" completed="@transactionCompleted">
+    <h1>Transaction Completed</h1>
+    <p>Your transaction has been successfully created.</p>
+    <NavLink href="/transaction" class="new">New Transaction</NavLink>
+    <NavLink href="/" class="back">Back to Home</NavLink>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    public TransactionForm model { get; set; } = default!;
+    private EditContext editContext = default!;
+    private ValidationMessageStore extraValidationMessageStore = default!;
+    private bool transactionCompleted = false;
+
+    protected override void OnInitialized()
+    {
+        model ??= new();
+        editContext = new(model);
+        extraValidationMessageStore = new(editContext);
+        editContext.OnFieldChanged += (_, _) => extraValidationMessageStore.Clear();
+    }
+
+    public async Task SubmitHandler()
+    {
+        var userClaimId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userClaimId is null)
+        {
+            return;
+        }
+
+        if (await ValidateForm() is not UserAggregate recipient)
+        {
+            return;
+        }
+
+        var request = new CreateTransactionRequest(
+            new(model.Amount!.Value, new("SEK")),
+            model.Description,
+            new($"{userClaimId.Issuer}:{userClaimId.Value}"),
+            [recipient.Id]
+        );
+        await mediator.Send(request);
+        transactionCompleted = true;
+    }
+
+    private async Task<UserAggregate?> ValidateForm()
+    {
+        var restIsValid = editContext.Validate();
+
+        if (editContext.IsValid(() => model.Recipient!))
+        {
+            var recipientResponse = await mediator.Send(new PhoneNumberQuery(new(model.Recipient!)));
+            if (recipientResponse is { User: UserAggregate recipient } && restIsValid)
+            {
+                return recipient;
+            }
+
+            extraValidationMessageStore.Add(() => model.Recipient!, $"Recipient with phone number {model.Recipient!} not found.");
+        }
+
+        return null;
+    }
+
+    public record TransactionForm
+    {
+        [Required(ErrorMessage = "Recipient is required.")]
+        [RegularExpression(@"^\+\d+$", ErrorMessage = "Recipient phone number must start with a '+' followed by only digits.")]
+        public string? Recipient { get; set; }
+
+        [Required(ErrorMessage = "Amount is required.")]
+        [Range(double.Epsilon, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        public decimal? Amount { get; set; }
+
+        [StringLength(100, ErrorMessage = "Description cannot exceed 100 characters.")]
+        public string Description { get; set; } = "";
+    }
+}
