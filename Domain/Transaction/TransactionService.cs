@@ -80,11 +80,11 @@ public class TransactionService(
             .GetTransactionsInvolvingUserAsync(userId, cancellationToken)
             .SelectMany(transaction =>
                 transaction
-                    .RecipientIds.Select(to => new Balance(
-                        transaction.SenderId,
-                        to,
-                        transaction.Amount / transaction.RecipientIds.Count
-                    ))
+                    .RecipientIds.Select(to =>
+                        transaction.SenderId == to
+                            ? new Balance(to, transaction.SenderId, new(0.0m, transaction.Amount.Currency))
+                            : new Balance(transaction.SenderId, to, transaction.Amount / transaction.RecipientIds.Count)
+                    )
                     .ToAsyncEnumerable()
             )
             .GroupByAwait(info => ValueTask.FromResult(info.To != userId ? info.To : info.From), AggregateBalance)

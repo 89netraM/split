@@ -153,6 +153,145 @@ public class GetBalanceForUserAsync
     }
 
     [TestMethod]
+    public async Task ReturnPlusMinusZero_ForTransactionsWhereSenderAndRecipientIsTheSame()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider(new(2025, 06, 16, 19, 36, 00, new(00, 00, 00)))
+        {
+            AutoAdvanceAmount = TimeSpan.FromMinutes(1),
+        };
+        var user = new UserId("user-A");
+        var transaction = new TransactionAggregate(
+            "Test Transaction",
+            new(100, new("SEK")),
+            user,
+            [user],
+            timeProvider.GetUtcNow()
+        );
+
+        var repository = new InMemoryTransactionRepository(transaction);
+
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
+
+        // Act
+        var result = await transactionService.GetBalanceForUserAsync(user, CancellationToken.None).ToArrayAsync();
+
+        // Assert
+        Assert.AreEqual(1, result.Length);
+        var balance = result[0];
+        Assert.AreEqual(user, balance.From);
+        Assert.AreEqual(user, balance.To);
+        Assert.AreEqual(0, balance.Amount.Amount);
+        Assert.AreEqual("SEK", balance.Amount.Currency.Value);
+    }
+
+    [TestMethod]
+    public async Task ReturnHalf_WhenSendingToTwoRecipients()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider(new(2025, 06, 16, 19, 36, 00, new(00, 00, 00)))
+        {
+            AutoAdvanceAmount = TimeSpan.FromMinutes(1),
+        };
+        var userA = new UserId("user-A");
+        var userB = new UserId("user-B");
+        var userC = new UserId("user-C");
+        var transaction = new TransactionAggregate(
+            "Test Transaction",
+            new(100, new("SEK")),
+            userA,
+            [userB, userC],
+            timeProvider.GetUtcNow()
+        );
+
+        var repository = new InMemoryTransactionRepository(transaction);
+
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
+
+        // Act
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+
+        // Assert
+        Assert.AreEqual(2, result.Length);
+        Assert.IsTrue(
+            result.Any(balance =>
+                balance.From == userA
+                && balance.To == userB
+                && balance.Amount.Amount == 50
+                && balance.Amount.Currency.Value == "SEK"
+            )
+        );
+        Assert.IsTrue(
+            result.Any(balance =>
+                balance.From == userA
+                && balance.To == userC
+                && balance.Amount.Amount == 50
+                && balance.Amount.Currency.Value == "SEK"
+            )
+        );
+    }
+
+    [TestMethod]
+    public async Task ReturnHalf_WhenSendingToTwoRecipients_AndOneOfTheRecipientsIsTheSender()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider(new(2025, 06, 16, 19, 36, 00, new(00, 00, 00)))
+        {
+            AutoAdvanceAmount = TimeSpan.FromMinutes(1),
+        };
+        var userA = new UserId("user-A");
+        var userB = new UserId("user-B");
+        var transaction = new TransactionAggregate(
+            "Test Transaction",
+            new(100, new("SEK")),
+            userA,
+            [userA, userB],
+            timeProvider.GetUtcNow()
+        );
+
+        var repository = new InMemoryTransactionRepository(transaction);
+
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
+
+        // Act
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+
+        // Assert
+        Assert.AreEqual(2, result.Length);
+        Assert.IsTrue(
+            result.Any(balance =>
+                balance.From == userA
+                && balance.To == userA
+                && balance.Amount.Amount == 0
+                && balance.Amount.Currency.Value == "SEK"
+            )
+        );
+        Assert.IsTrue(
+            result.Any(balance =>
+                balance.From == userA
+                && balance.To == userB
+                && balance.Amount.Amount == 50
+                && balance.Amount.Currency.Value == "SEK"
+            )
+        );
+    }
+
+    [TestMethod]
     public async Task ReturnMultipleBalancesForSameUserPair_WhenPairHasMadeTransactionsInMultipleCurrencies()
     {
         // Arrange
