@@ -63,13 +63,17 @@ public static class Extensions
                             !context.Request.Path.StartsWithSegments(HealthEndpointPath)
                             && !context.Request.Path.StartsWithSegments(AlivenessEndpointPath)
                     )
-                    .AddHttpClientInstrumentation();
+                    .AddHttpClientInstrumentation()
+                    .AddSplitTracing();
             });
 
         builder.AddOpenTelemetryExporters();
 
         return builder;
     }
+
+    private static TracerProviderBuilder AddSplitTracing(this TracerProviderBuilder tracing) =>
+        tracing.AddSource("Split.Domain.Transaction");
 
     private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder

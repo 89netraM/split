@@ -52,15 +52,16 @@ public class HandleShould
         );
 
         // Act
-        var result = await balanceQueryHandler.Handle(new(userA), CancellationToken.None).ToArrayAsync();
+        var result = await balanceQueryHandler.Handle(new(userA), CancellationToken.None);
 
         // Assert
-        Assert.AreEqual(1, result.Length);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(1, result.Balances.Length);
 
-        var response = result[0];
-        Assert.AreEqual(userA, response.Balance.From);
-        Assert.AreEqual(userB, response.Balance.To);
-        Assert.AreEqual(50, response.Balance.Amount.Amount);
-        Assert.AreEqual("SEK", response.Balance.Amount.Currency.Value);
+        var balance = result.Balances[0];
+        Assert.AreEqual(userA, balance.From);
+        Assert.AreEqual(userB, balance.To);
+        Assert.AreEqual(50, balance.Amount.Amount);
+        Assert.AreEqual("SEK", balance.Amount.Currency.Value);
     }
 }

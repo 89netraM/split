@@ -1,20 +1,16 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Mediator;
 using Split.Domain.Primitives;
 
 namespace Split.Domain.Transaction.Events;
 
-public record BalanceQuery(UserId UserId) : IStreamQuery<BalanceResponse>;
+public record BalanceQuery(UserId UserId) : IQuery<BalanceResponse>;
 
-public record BalanceResponse(Balance Balance);
+public record BalanceResponse(Balance[] Balances);
 
-public class BalanceQueryHandler(TransactionService transactionService)
-    : IStreamQueryHandler<BalanceQuery, BalanceResponse>
+public class BalanceQueryHandler(TransactionService transactionService) : IQueryHandler<BalanceQuery, BalanceResponse>
 {
-    public IAsyncEnumerable<BalanceResponse> Handle(BalanceQuery query, CancellationToken cancellationToken) =>
-        transactionService
-            .GetBalanceForUserAsync(query.UserId, cancellationToken)
-            .Select(balance => new BalanceResponse(balance));
+    public async ValueTask<BalanceResponse> Handle(BalanceQuery query, CancellationToken cancellationToken) =>
+        new(await transactionService.GetBalanceForUserAsync(query.UserId, cancellationToken));
 }

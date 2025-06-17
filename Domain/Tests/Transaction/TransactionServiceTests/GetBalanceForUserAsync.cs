@@ -49,7 +49,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(1, result.Length);
@@ -96,7 +96,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(1, result.Length);
@@ -143,7 +143,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(1, result.Length);
@@ -179,7 +179,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(user, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(user, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(1, result.Length);
@@ -219,7 +219,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(2, result.Length);
@@ -269,7 +269,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(2, result.Length);
@@ -326,7 +326,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(2, result.Length);
@@ -385,7 +385,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.AreEqual(2, result.Length);
@@ -444,7 +444,7 @@ public class GetBalanceForUserAsync
         );
 
         // Act
-        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None).ToArrayAsync();
+        var result = await transactionService.GetBalanceForUserAsync(userA, CancellationToken.None);
 
         // Assert
         Assert.IsFalse(result.Any(balance => balance.From != userA && balance.To != userA));

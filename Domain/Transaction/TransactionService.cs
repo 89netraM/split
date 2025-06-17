@@ -72,11 +72,14 @@ public class TransactionService(
         return transactionRepository.GetTransactionsInvolvingUserAsync(userId, cancellationToken);
     }
 
-    public IAsyncEnumerable<Balance> GetBalanceForUserAsync(UserId userId, CancellationToken cancellationToken)
+    public async Task<Balance[]> GetBalanceForUserAsync(UserId userId, CancellationToken cancellationToken)
     {
+        using var activity = Tracing.Source.StartActivity("GetBalanceForUserAsync");
+        activity?.SetTag("userId", userId.Value);
+
         logger.LogDebug("Retrieving balance for user ID {UserId}", userId);
 
-        return transactionRepository
+        return await transactionRepository
             .GetTransactionsInvolvingUserAsync(userId, cancellationToken)
             .SelectMany(transaction =>
                 transaction
@@ -88,7 +91,8 @@ public class TransactionService(
                     .ToAsyncEnumerable()
             )
             .GroupByAwait(info => ValueTask.FromResult(info.To != userId ? info.To : info.From), AggregateBalance)
-            .SelectMany(g => g.ToAsyncEnumerable());
+            .SelectMany(g => g.ToAsyncEnumerable())
+            .ToArrayAsync(cancellationToken);
 
         static async ValueTask<IEnumerable<Balance>> AggregateBalance(UserId _, IAsyncEnumerable<Balance> group)
         {
