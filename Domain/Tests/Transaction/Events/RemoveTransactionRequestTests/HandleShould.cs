@@ -24,7 +24,7 @@ public class HandleShould
                 new InMemoryUserRepository()
             )
         );
-        var request = new RemoveTransactionRequest(new(new("33a1cb86-a2cd-4853-ae65-2cecdd099f2d")));
+        var request = new RemoveTransactionRequest(new(new("01977ea7-1757-7606-aef1-0ec2880255ed")));
 
         // Act & Assert
         await handler.Handle(request, CancellationToken.None);

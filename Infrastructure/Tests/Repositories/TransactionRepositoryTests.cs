@@ -45,7 +45,7 @@ public class TransactionRepositoryTests : PostgresTestBase
     {
         // Arrange
         var transactionRepository = Services.GetRequiredService<ITransactionRepository>();
-        var transactionId = new TransactionId(new("854f85de-b0d7-451f-bddb-73214af5aa68"));
+        var transactionId = new TransactionId(new("01977ea8-61b4-7905-81d2-e6df605cc06b"));
 
         // Act
         var result = await transactionRepository.GetTransactionByIdAsync(transactionId, CancellationToken.None);

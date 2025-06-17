@@ -48,7 +48,7 @@ public class RemoveTransactionShould
     {
         // Arrange
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 11, 22, 00, new(02, 00, 00)));
-        var transactionId = new TransactionId(new("ad762c8d-2bd6-4c76-b0c7-6a4366874979"));
+        var transactionId = new TransactionId(new("01977ea7-6576-7e1e-a6d7-b1f748402889"));
         var transactionRepository = new InMemoryTransactionRepository();
         var transactionService = new TransactionService(
             new NullLogger<TransactionService>(),

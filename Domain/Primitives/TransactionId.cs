@@ -15,6 +15,10 @@ public partial class TransactionId : IEquatable<TransactionId>
         {
             throw new ArgumentException("Transaction ID cannot be empty", nameof(value));
         }
+        if (value.Version is not 7)
+        {
+            throw new ArgumentException("Transaction ID must be a version 7 GUID", nameof(value));
+        }
 
         Value = value;
     }

@@ -11,7 +11,7 @@ public class ConstructorShould
     public void ConstructValidUserId()
     {
         // Arrange
-        var validTransactionId = Guid.NewGuid();
+        var validTransactionId = Guid.CreateVersion7();
 
         // Act & Assert
         // Should not throw an exception for a valid TransactionId
@@ -23,5 +23,12 @@ public class ConstructorShould
     {
         // Act & Assert
         Assert.ThrowsException<ArgumentException>(() => new TransactionId(Guid.Empty));
+    }
+
+    [TestMethod]
+    public void ThrowExceptionForVersion4TransactionId()
+    {
+        // Act & Assert
+        Assert.ThrowsException<ArgumentException>(() => new TransactionId(Guid.NewGuid()));
     }
 }

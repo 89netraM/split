@@ -31,7 +31,7 @@ public class TransactionAggregate
             throw new NoRecipientsException(nameof(recipientIds));
         }
 
-        Id = new(Guid.NewGuid());
+        Id = new(Guid.CreateVersion7(createdAt));
         Description = description;
         Amount = amount;
         SenderId = senderId;
