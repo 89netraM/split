@@ -46,6 +46,7 @@ body {
 main {
     height: 100%;
     overflow: hidden auto;
+    padding-block-end: 5rem;
 }
 
 .simple-form {

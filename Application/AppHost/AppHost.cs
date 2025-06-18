@@ -2,7 +2,7 @@ using Aspire.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var postgres = builder.AddPostgres("postgres").WithPgAdmin();
+var postgres = builder.AddPostgres("postgres").WithPgAdmin().WithDataVolume("postgres-data");
 var database = postgres.AddDatabase("database");
 
 builder

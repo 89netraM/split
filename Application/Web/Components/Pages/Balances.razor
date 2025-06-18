@@ -1,0 +1,88 @@
+@page "/balances"
+@using Mediator
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Http
+@using Split.Domain.Primitives
+@using Split.Domain.Transaction
+@using Split.Domain.Transaction.Events
+@using System.Security.Claims
+@using System.Globalization
+@using Split.Domain.User
+@using Split.Domain.User.Events
+@rendermode InteractiveServer
+@attribute [Authorize]
+@inject IHttpContextAccessor httpContextAccessor
+@inject IMediator mediator
+@inject NavigationManager navigationManager
+
+<h1>Balances</h1>
+
+<div id="balances">
+    <div>From</div>
+    <div>Amount</div>
+    <div>To</div>
+    @foreach (var balance in balances)
+    {
+        <div class="from">
+            @if (balance.From.Id == userId)
+            {
+                <strong>@(balance.From.Name)</strong>
+            }
+            else
+            {
+                @(balance.From.Name)
+            }
+        </div>
+        <div class="amount">
+            <span class="currency">@(balance.Amount.Currency.Value)</span>&nbsp;@(balance.Amount.Amount.ToString("N2", CultureInfo.CurrentCulture))
+        </div>
+        <div class="to">
+            @if (balance.To.Id == userId)
+            {
+                <strong>@(balance.To.Name)</strong>
+            }
+            else
+            {
+                @(balance.To.Name)
+            }
+        </div>
+        @if (balance.To.Id == userId && balance.Amount.Amount > 0)
+        {
+            <button class="settle" @onclick="@(_ => SettleDebt(balance.To, balance.Amount))">Settle</button>
+        }
+    }
+</div>
+
+@code {
+    private UserId userId = default!;
+    private BalanceUI[] balances = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userClaimId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userClaimId is null)
+        {
+            return;
+        }
+        userId = new($"{userClaimId.Issuer}:{userClaimId.Value}");
+
+        var response = await mediator.Send(new BalanceQuery(userId));
+        balances = await response.Balances.ToAsyncEnumerable()
+            .SelectAwait(async balance => await MapBalance(balance))
+            .ToArrayAsync()
+            .ConfigureAwait(false);
+    }
+
+    private async Task<BalanceUI> MapBalance(Balance balance) =>
+        new BalanceUI(
+            From: (await mediator.Send(new UserQuery(balance.From))).User!,
+            Amount: balance.Amount,
+            To: (await mediator.Send(new UserQuery(balance.To))).User!
+        );
+
+    private void SettleDebt(UserAggregate to, Money amount) =>
+        // TODO: Build a proper Swish link
+        navigationManager.NavigateTo("swish://payment");
+
+    private record BalanceUI(UserAggregate From, Money Amount, UserAggregate To);
+}

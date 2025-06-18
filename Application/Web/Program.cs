@@ -19,6 +19,7 @@ builder.Services.AddGitHubAuthentication().AddIsUserAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddLocalization();
 
 builder.Services.AddSingleton(TimeProvider.System).AddScoped<UserService>().AddScoped<TransactionService>();
 
@@ -40,6 +41,12 @@ app.UseAuthentication().UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
+app.UseRequestLocalization(
+    new RequestLocalizationOptions()
+        .AddSupportedCultures(["en", "en-US", "en-GB", "sv", "sv-SE"])
+        .SetDefaultCulture("sv-SE")
+);
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
