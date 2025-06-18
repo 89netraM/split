@@ -19,6 +19,5 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Localization" />
-    <PackageReference Include="QRCoder" />
   </ItemGroup>
 </Project>
