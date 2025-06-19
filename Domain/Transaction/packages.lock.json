@@ -56,9 +56,6 @@
           "Split.Domain.Primitives": "[1.0.0, )",
           "System.Linq.Async": "[6.0.1, )"
         }
-      },
-      "Split.Utilities": {
-        "type": "Project"
       }
     },
     "net9.0/linux-arm64": {},
