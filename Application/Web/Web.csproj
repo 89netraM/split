@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Infrastructure\Repositories\Repositories.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Swish\Swish.csproj" />
     <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Domain\Transaction\Transaction.csproj" />
     <ProjectReference Include="..\..\Domain\User\User.csproj" />

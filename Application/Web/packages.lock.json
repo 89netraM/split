@@ -819,6 +819,12 @@
           "Split.Domain.User": "[1.0.0, )"
         }
       },
+      "Split.Infrastructure.Swish": {
+        "type": "Project",
+        "dependencies": {
+          "Split.Domain.Primitives": "[1.0.0, )"
+        }
+      },
       "Aspire.Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "CentralTransitive",
         "requested": "[9.3.0, )",

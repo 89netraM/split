@@ -9,11 +9,13 @@
 @using System.Globalization
 @using Split.Domain.User
 @using Split.Domain.User.Events
+@using Split.Infrastructure.Swish
 @rendermode InteractiveServer
 @attribute [Authorize]
 @inject IHttpContextAccessor httpContextAccessor
 @inject IMediator mediator
 @inject NavigationManager navigationManager
+@inject SwishService swishService
 
 <h1>Balances</h1>
 
@@ -46,16 +48,26 @@
                 @(balance.To.Name)
             }
         </div>
-        @if (balance.To.Id == userId && balance.Amount.Amount > 0)
+        @if (balance.To.Id == userId && balance.Amount.Currency.Value is "SEK" && balance.Amount.Amount > 0)
         {
-            <button class="settle" @onclick="@(_ => SettleDebt(balance.To, balance.Amount))">Settle</button>
+            <button class="settle" @onclick="@(_ => SettleDebt(balance.From, balance.Amount))">Settle</button>
         }
     }
+</div>
+
+<div id="confirm-swish" open="@confirmSwishOpen">
+    <h1>Confirm Swish</h1>
+    <p>Have you sent the Swish payment?</p>
+    <button class="yes" @onclick="ConfirmSwish">Yes</button>
+    <button class="no" @onclick="CloseConfirmSwishDialog">No</button>
 </div>
 
 @code {
     private UserId userId = default!;
     private BalanceUI[] balances = [];
+
+    private bool confirmSwishOpen = false;
+    private ConfirmingSwish? confirmingSwishTarget;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,7 +77,11 @@
             return;
         }
         userId = new($"{userClaimId.Issuer}:{userClaimId.Value}");
+        await LoadBalances();
+    }
 
+    private async Task LoadBalances()
+    {
         var response = await mediator.Send(new BalanceQuery(userId));
         balances = await response.Balances.ToAsyncEnumerable()
             .SelectAwait(async balance => await MapBalance(balance))
@@ -80,9 +96,35 @@
             To: (await mediator.Send(new UserQuery(balance.To))).User!
         );
 
-    private void SettleDebt(UserAggregate to, Money amount) =>
-        // TODO: Build a proper Swish link
-        navigationManager.NavigateTo("swish://payment");
+    private void SettleDebt(UserAggregate from, Money amount)
+    {
+        navigationManager.NavigateTo(swishService.BuildRequestUrl(from.PhoneNumber, amount).AbsoluteUri);
+        confirmSwishOpen = true;
+        confirmingSwishTarget = new(from.Id, amount);
+    }
+
+    private async Task ConfirmSwish()
+    {
+        if (confirmingSwishTarget is not null)
+        {
+            await mediator.Send(new CreateTransactionRequest(
+                confirmingSwishTarget.Amount,
+                "Settling debt",
+                userId,
+                [confirmingSwishTarget.From]
+            ));
+
+            await LoadBalances();
+        }
+
+        CloseConfirmSwishDialog();
+    }
+
+    private void CloseConfirmSwishDialog()
+    {
+        confirmSwishOpen = false;
+    }
 
     private record BalanceUI(UserAggregate From, Money Amount, UserAggregate To);
+    private record ConfirmingSwish(UserId From, Money Amount);
 }

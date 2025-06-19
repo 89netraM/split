@@ -7,6 +7,7 @@ using Split.Application.Web.Components;
 using Split.Domain.Transaction;
 using Split.Domain.User;
 using Split.Infrastructure.Repositories;
+using Split.Infrastructure.Swish;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddLocalization();
 
 builder.Services.AddSingleton(TimeProvider.System).AddScoped<UserService>().AddScoped<TransactionService>();
+
+builder.Services.AddSingleton<SwishService>();
 
 builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
