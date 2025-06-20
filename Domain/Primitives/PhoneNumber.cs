@@ -8,7 +8,7 @@ namespace Split.Domain.Primitives;
 [DebuggerDisplay("{Value}")]
 public partial class PhoneNumber : IEquatable<PhoneNumber>
 {
-    [GeneratedRegex(@"^\+?\d+$")]
+    [GeneratedRegex(@"^\+\d+$")]
     private static partial Regex PhoneNumberValidator { get; }
 
     public string Value { get; }
@@ -17,7 +17,7 @@ public partial class PhoneNumber : IEquatable<PhoneNumber>
     {
         if (!PhoneNumberValidator.IsMatch(value))
         {
-            throw new ArgumentException("Invalid phone number format", nameof(value));
+            throw new PhoneNumberFormatException(value, nameof(value));
         }
 
         Value = value;
@@ -41,3 +41,6 @@ public partial class PhoneNumber : IEquatable<PhoneNumber>
     [ExcludeFromCodeCoverage]
     public static bool operator !=(PhoneNumber? left, PhoneNumber? right) => !(left == right);
 }
+
+public class PhoneNumberFormatException(string phoneNumber, string paramName)
+    : ArgumentException(message: $"The phone number ({phoneNumber}) is of an invalid format.", paramName);

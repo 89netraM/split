@@ -21,7 +21,12 @@ public class HandleShould
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
         };
-        var user = new UserAggregate(new("existing-user-id"), "Test User", new("1234567890"), timeProvider.GetUtcNow());
+        var user = new UserAggregate(
+            new("existing-user-id"),
+            "Test User",
+            new("+1234567890"),
+            timeProvider.GetUtcNow()
+        );
         var handler = new PhoneNumberQueryHandler(
             new(new NullLogger<UserService>(), timeProvider, new InMemoryUserRepository(user))
         );

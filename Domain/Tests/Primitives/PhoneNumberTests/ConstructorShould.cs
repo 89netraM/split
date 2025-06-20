@@ -1,4 +1,3 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Split.Domain.Primitives;
 
@@ -8,8 +7,8 @@ namespace Split.Domain.Tests.Primitives.PhoneNumberTests;
 public class ConstructorShould
 {
     [TestMethod]
-    [DataRow("1234567890")]
     [DataRow("+46234567890")]
+    [DataRow("+47987654321")]
     public void ConstructValidPhoneNumbers(string phoneNumber)
     {
         // Should not throw an exception for valid phone numbers
@@ -19,10 +18,11 @@ public class ConstructorShould
     [TestMethod]
     [DataRow("")]
     [DataRow(" ")]
+    [DataRow("1234567890")]
     [DataRow("123-456 78 90")]
     [DataRow("not-a-phone-number")]
     public void ThrowExceptionForInvalidPhoneNumbers(string phoneNumber)
     {
-        Assert.ThrowsException<ArgumentException>(() => new PhoneNumber(phoneNumber));
+        Assert.ThrowsExactly<PhoneNumberFormatException>(() => new PhoneNumber(phoneNumber));
     }
 }

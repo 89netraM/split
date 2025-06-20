@@ -21,7 +21,12 @@ public class GetUserByPhoneNumberAsyncShould
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
         };
-        var user = new UserAggregate(new("existing-user-id"), "Test User", new("1234567890"), timeProvider.GetUtcNow());
+        var user = new UserAggregate(
+            new("existing-user-id"),
+            "Test User",
+            new("+1234567890"),
+            timeProvider.GetUtcNow()
+        );
         var userService = new UserService(
             new NullLogger<UserService>(),
             timeProvider,
@@ -40,7 +45,7 @@ public class GetUserByPhoneNumberAsyncShould
     public async Task ReturnNull_WhenUserDoesNotExist()
     {
         // Arrange
-        var userPhoneNumber = new PhoneNumber("0123456789");
+        var userPhoneNumber = new PhoneNumber("+9123456789");
         var userService = new UserService(
             new NullLogger<UserService>(),
             new FakeTimeProvider(),
@@ -62,7 +67,12 @@ public class GetUserByPhoneNumberAsyncShould
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
         };
-        var user = new UserAggregate(new("existing-user-id"), "Test User", new("1234567890"), timeProvider.GetUtcNow());
+        var user = new UserAggregate(
+            new("existing-user-id"),
+            "Test User",
+            new("+1234567890"),
+            timeProvider.GetUtcNow()
+        );
         user.Remove(timeProvider.GetUtcNow());
         var userService = new UserService(
             new NullLogger<UserService>(),

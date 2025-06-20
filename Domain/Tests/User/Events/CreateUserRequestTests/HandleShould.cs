@@ -23,7 +23,7 @@ public class HandleShould
         var request = new CreateUserRequest(
             new("1e2d19e5-d92d-42da-a927-4686d3542453"),
             "A. N. Other",
-            new PhoneNumber("1234567890")
+            new PhoneNumber("+1234567890")
         );
 
         // Act

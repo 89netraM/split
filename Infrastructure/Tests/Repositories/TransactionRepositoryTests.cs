@@ -27,13 +27,13 @@ public class TransactionRepositoryTests : PostgresTestBase
         userA = new UserAggregate(
             new("user-a"),
             "User A",
-            new("0123456789"),
+            new("+9123456789"),
             new(2025, 06, 09, 17, 22, 00, new(00, 00, 00))
         );
         userB = new UserAggregate(
             new("user-b"),
             "User B",
-            new("0987654321"),
+            new("+1987654321"),
             new(2025, 06, 09, 17, 22, 00, new(00, 00, 00))
         );
         await userRepository.SaveAsync(userA, CancellationToken.None);

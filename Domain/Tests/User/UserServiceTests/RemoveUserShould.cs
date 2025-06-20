@@ -21,7 +21,7 @@ public class RemoveUserShould
         var user = new UserAggregate(
             new("8d09b539-6019-43d5-a133-18372d77576e"),
             "A. N. Other",
-            new("1234567890"),
+            new("+1234567890"),
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(user);
@@ -58,7 +58,7 @@ public class RemoveUserShould
         var user = new UserAggregate(
             new("8371ebfb-70a3-48a7-ae64-afc80c37d955"),
             "A. N. Other",
-            new("1234567890"),
+            new("+1234567890"),
             timeProvider.GetUtcNow()
         );
         var removedAt = timeProvider.GetUtcNow();

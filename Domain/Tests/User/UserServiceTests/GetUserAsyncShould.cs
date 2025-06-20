@@ -21,7 +21,12 @@ public class GetUserAsyncShould
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
         };
-        var user = new UserAggregate(new("existing-user-id"), "Test User", new("1234567890"), timeProvider.GetUtcNow());
+        var user = new UserAggregate(
+            new("existing-user-id"),
+            "Test User",
+            new("+1234567890"),
+            timeProvider.GetUtcNow()
+        );
         var userService = new UserService(
             new NullLogger<UserService>(),
             timeProvider,
@@ -62,7 +67,12 @@ public class GetUserAsyncShould
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
         };
-        var user = new UserAggregate(new("existing-user-id"), "Test User", new("1234567890"), timeProvider.GetUtcNow());
+        var user = new UserAggregate(
+            new("existing-user-id"),
+            "Test User",
+            new("+1234567890"),
+            timeProvider.GetUtcNow()
+        );
         user.Remove(timeProvider.GetUtcNow());
         var userService = new UserService(
             new NullLogger<UserService>(),

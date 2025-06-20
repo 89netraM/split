@@ -34,7 +34,7 @@ public class UserRepositoryTests : PostgresTestBase
         var user = new UserAggregate(
             new("user-id"),
             "Test User",
-            new("0123456789"),
+            new("+9123456789"),
             new(2025, 06, 09, 16, 25, 00, new(00, 00, 00))
         );
 
@@ -59,7 +59,7 @@ public class UserRepositoryTests : PostgresTestBase
         var user = new UserAggregate(
             new("user-id"),
             "Test User",
-            new("0123456789"),
+            new("+9123456789"),
             new(2025, 06, 09, 16, 25, 00, new(00, 00, 00))
         );
 
@@ -84,7 +84,7 @@ public class UserRepositoryTests : PostgresTestBase
         var user = new UserAggregate(
             new("user-id"),
             "Test User",
-            new("0123456789"),
+            new("+9123456789"),
             new(2025, 06, 09, 16, 25, 00, new(00, 00, 00))
         );
 

@@ -26,11 +26,11 @@ public class HandleShould
 
         var amount = new Money(250, new("SEK"));
         var description = "Lunch";
-        var sender = new UserAggregate(new("user-sender"), "Sender", new("0123456789"), timeProvider.GetUtcNow());
+        var sender = new UserAggregate(new("user-sender"), "Sender", new("+0123456789"), timeProvider.GetUtcNow());
         var recipient = new UserAggregate(
             new("user-recipient"),
             "Recipient",
-            new("9876543210"),
+            new("+9876543210"),
             timeProvider.GetUtcNow()
         );
 

@@ -18,7 +18,7 @@ public class CreateUserShould
     {
         // Arrange
         var name = "A. N. Other";
-        var phoneNumber = new PhoneNumber("1234567890");
+        var phoneNumber = new PhoneNumber("+1234567890");
         var userService = new UserService(
             new NullLogger<UserService>(),
             new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00))),
@@ -50,7 +50,7 @@ public class CreateUserShould
         var existingUser = new UserAggregate(
             new("a615cde3-c61e-47f7-9093-19bef8085edf"),
             "A. N. Other",
-            new("1234567890"),
+            new("+1234567890"),
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(existingUser);
@@ -80,7 +80,7 @@ public class CreateUserShould
         var existingUser = new UserAggregate(
             new("97b0f29d-60f9-44ea-af47-65c5a627536e"),
             "Existing User",
-            new PhoneNumber("1234567890"),
+            new("+1234567890"),
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(existingUser);
@@ -100,7 +100,7 @@ public class CreateUserShould
         var existingUser = new UserAggregate(
             new("97b0f29d-60f9-44ea-af47-65c5a627536e"),
             "A. N. Other",
-            new PhoneNumber("1234567890"),
+            new("+1234567890"),
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(existingUser);
@@ -108,7 +108,7 @@ public class CreateUserShould
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<UserAlreadyExistsException>(() =>
-            userService.CreateUserAsync(existingUser.Id, existingUser.Name, new("0987654321"), CancellationToken.None)
+            userService.CreateUserAsync(existingUser.Id, existingUser.Name, new("+0987654321"), CancellationToken.None)
         );
     }
 
@@ -118,7 +118,7 @@ public class CreateUserShould
         // Arrange
         var id = new UserId("f35a40a1-cd24-46d0-a776-73f7111ed3e8");
         var name = "A. N. Other";
-        var phoneNumber = new PhoneNumber("1234567890");
+        var phoneNumber = new PhoneNumber("+1234567890");
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00)))
         {
             AutoAdvanceAmount = TimeSpan.FromMinutes(1),
