@@ -28,11 +28,13 @@ public abstract class PostgresTestBase
                         new Dictionary<string, string?>
                         {
                             ["ConnectionStrings:database"] = Containers.Postgres.GetConnectionString(),
+                            ["Logging:LogLevel:Default"] = "Debug",
                         }
                     )
                     .Build()
             )
             .AddSingleton<IConfiguration>(sp => sp.GetRequiredService<IConfigurationRoot>());
+        services.AddLogging();
         services.AddRepositories();
         services.AddSingleton(Mediator = Substitute.For<IMediator>());
         Services = services.BuildServiceProvider();

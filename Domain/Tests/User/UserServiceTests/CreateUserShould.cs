@@ -22,7 +22,8 @@ public class CreateUserShould
         var userService = new UserService(
             new NullLogger<UserService>(),
             new FakeTimeProvider(new(2025, 05, 31, 00, 49, 00, new(02, 00, 00))),
-            new InMemoryUserRepository()
+            new InMemoryUserRepository(),
+            new InMemoryUserRelationshipRepository()
         );
 
         // Act
@@ -54,7 +55,12 @@ public class CreateUserShould
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(existingUser);
-        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
+        var userService = new UserService(
+            new NullLogger<UserService>(),
+            timeProvider,
+            userRepository,
+            new InMemoryUserRelationshipRepository()
+        );
 
         // Act
         var createdUser = await userService.CreateUserAsync(
@@ -84,7 +90,12 @@ public class CreateUserShould
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(existingUser);
-        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
+        var userService = new UserService(
+            new NullLogger<UserService>(),
+            timeProvider,
+            userRepository,
+            new InMemoryUserRelationshipRepository()
+        );
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<UserAlreadyExistsException>(() =>
@@ -104,7 +115,12 @@ public class CreateUserShould
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(existingUser);
-        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
+        var userService = new UserService(
+            new NullLogger<UserService>(),
+            timeProvider,
+            userRepository,
+            new InMemoryUserRelationshipRepository()
+        );
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<UserAlreadyExistsException>(() =>
@@ -126,7 +142,12 @@ public class CreateUserShould
         var userRepository = new InMemoryUserRepository(
             new UserAggregate(new("user-id"), "Existing User", phoneNumber, timeProvider.GetUtcNow())
         );
-        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
+        var userService = new UserService(
+            new NullLogger<UserService>(),
+            timeProvider,
+            userRepository,
+            new InMemoryUserRelationshipRepository()
+        );
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<PhoneNumberInUseException>(() =>

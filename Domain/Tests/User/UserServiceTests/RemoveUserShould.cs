@@ -25,7 +25,12 @@ public class RemoveUserShould
             timeProvider.GetUtcNow()
         );
         var userRepository = new InMemoryUserRepository(user);
-        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
+        var userService = new UserService(
+            new NullLogger<UserService>(),
+            timeProvider,
+            userRepository,
+            new InMemoryUserRelationshipRepository()
+        );
 
         // Act
         await userService.RemoveUserAsync(user.Id, CancellationToken.None);
@@ -41,7 +46,12 @@ public class RemoveUserShould
         var timeProvider = new FakeTimeProvider(new(2025, 05, 31, 01, 27, 00, new(02, 00, 00)));
         var userId = new UserId("063db591-512f-4b5e-8e20-e78950419ec2");
         var userRepository = new InMemoryUserRepository();
-        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
+        var userService = new UserService(
+            new NullLogger<UserService>(),
+            timeProvider,
+            userRepository,
+            new InMemoryUserRelationshipRepository()
+        );
 
         // Act & Assert
         await userService.RemoveUserAsync(userId, CancellationToken.None);
@@ -64,7 +74,12 @@ public class RemoveUserShould
         var removedAt = timeProvider.GetUtcNow();
         user.Remove(removedAt);
         var userRepository = new InMemoryUserRepository(user);
-        var userService = new UserService(new NullLogger<UserService>(), timeProvider, userRepository);
+        var userService = new UserService(
+            new NullLogger<UserService>(),
+            timeProvider,
+            userRepository,
+            new InMemoryUserRelationshipRepository()
+        );
 
         // Act
         await userService.RemoveUserAsync(user.Id, CancellationToken.None);

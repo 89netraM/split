@@ -17,7 +17,12 @@ public class HandleShould
     {
         // Arrange
         var handler = new RemoveUserRequestHandler(
-            new UserService(new NullLogger<UserService>(), new FakeTimeProvider(), new InMemoryUserRepository())
+            new UserService(
+                new NullLogger<UserService>(),
+                new FakeTimeProvider(),
+                new InMemoryUserRepository(),
+                new InMemoryUserRelationshipRepository()
+            )
         );
         var request = new RemoveUserRequest(new("6ef5ae5c-575a-4971-afeb-ee4fd0ccd2e4"));
 

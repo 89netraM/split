@@ -1,9 +1,12 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Split.Domain.Primitives;
+using Split.Domain.Transaction;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 

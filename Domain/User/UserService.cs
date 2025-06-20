@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -6,7 +7,12 @@ using Split.Domain.Primitives;
 
 namespace Split.Domain.User;
 
-public class UserService(ILogger<UserService> logger, TimeProvider timeProvider, IUserRepository userRepository)
+public class UserService(
+    ILogger<UserService> logger,
+    TimeProvider timeProvider,
+    IUserRepository userRepository,
+    IUserRelationshipRepository userRelationshipRepository
+)
 {
     public async Task<UserAggregate> CreateUserAsync(
         UserId userId,
@@ -86,6 +92,9 @@ public class UserService(ILogger<UserService> logger, TimeProvider timeProvider,
         logger.LogDebug("Successfully retrieved user with phone number: {PhoneNumber}", phoneNumber);
         return user;
     }
+
+    public IAsyncEnumerable<UserAggregate> GetRelatedUsersAsync(UserId userId, CancellationToken cancellationToken) =>
+        userRelationshipRepository.GetRelatedUsersAsync(userId, cancellationToken);
 
     public async Task RemoveUserAsync(UserId userId, CancellationToken cancellationToken)
     {

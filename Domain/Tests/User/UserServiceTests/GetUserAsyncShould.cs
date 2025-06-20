@@ -27,10 +27,12 @@ public class GetUserAsyncShould
             new("+1234567890"),
             timeProvider.GetUtcNow()
         );
+        var userRepository = new InMemoryUserRepository(user);
         var userService = new UserService(
             new NullLogger<UserService>(),
             timeProvider,
-            new InMemoryUserRepository(user)
+            userRepository,
+            new InMemoryUserRelationshipRepository()
         );
 
         // Act
@@ -49,7 +51,8 @@ public class GetUserAsyncShould
         var userService = new UserService(
             new NullLogger<UserService>(),
             new FakeTimeProvider(),
-            new InMemoryUserRepository()
+            new InMemoryUserRepository(),
+            new InMemoryUserRelationshipRepository()
         );
 
         // Act
@@ -74,10 +77,12 @@ public class GetUserAsyncShould
             timeProvider.GetUtcNow()
         );
         user.Remove(timeProvider.GetUtcNow());
+        var userRepository = new InMemoryUserRepository(user);
         var userService = new UserService(
             new NullLogger<UserService>(),
             timeProvider,
-            new InMemoryUserRepository(user)
+            userRepository,
+            new InMemoryUserRelationshipRepository()
         );
 
         // Act

@@ -18,7 +18,12 @@ public class HandleShould
     {
         // Arrange
         var handler = new CreateUserRequestHandler(
-            new UserService(new NullLogger<UserService>(), new FakeTimeProvider(), new InMemoryUserRepository())
+            new UserService(
+                new NullLogger<UserService>(),
+                new FakeTimeProvider(),
+                new InMemoryUserRepository(),
+                new InMemoryUserRelationshipRepository()
+            )
         );
         var request = new CreateUserRequest(
             new("1e2d19e5-d92d-42da-a927-4686d3542453"),

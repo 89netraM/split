@@ -27,8 +27,9 @@ public class HandleShould
             new("+1234567890"),
             timeProvider.GetUtcNow()
         );
+        var userRepository = new InMemoryUserRepository(user);
         var handler = new PhoneNumberQueryHandler(
-            new(new NullLogger<UserService>(), timeProvider, new InMemoryUserRepository(user))
+            new(new NullLogger<UserService>(), timeProvider, userRepository, new InMemoryUserRelationshipRepository())
         );
 
         // Act
