@@ -118,5 +118,3 @@ public class UserAlreadyExistsException(UserId userId) : Exception($"A user with
 
 public class PhoneNumberInUseException(PhoneNumber phoneNumber)
     : Exception($"A user with this phone number {phoneNumber} already exists");
-
-public class UserNotFoundException(UserId userId) : Exception($"A user with this id {userId} does not exist");

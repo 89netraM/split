@@ -63,12 +63,6 @@ public class SplitDbContext(DbContextOptions<SplitDbContext> options) : DbContex
     }
 }
 
-file class TransactionRecipient
-{
-    public required TransactionId TransactionId { get; init; }
-    public required UserId RecipientId { get; init; }
-}
-
 file class UserIdConverter() : ValueConverter<UserId, string>(v => v.Value, v => new UserId(v));
 
 file class PhoneNumberConverter() : ValueConverter<PhoneNumber, string>(v => v.Value, v => new PhoneNumber(v));
