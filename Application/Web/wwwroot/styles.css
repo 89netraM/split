@@ -78,7 +78,7 @@ main {
                 position: relative;
                 margin-block-start: 2em;
 
-                span {
+                span:first-of-type {
                     position: absolute;
                     transition: transform 0.15s ease;
                     transform-origin: left;
@@ -89,7 +89,7 @@ main {
                     }
                 }
 
-                &:focus-within span {
+                &:focus-within span:first-of-type {
                     color: var(--primary-color);
                 }
 
@@ -127,8 +127,10 @@ main {
         }
 
         .validation-message {
-            margin-block-start: -1rem;
             color: var(--error-color);
+            position: relative;
+            margin-block-start: -1rem;
+            top: 1rem;
         }
     }
 }

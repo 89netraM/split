@@ -3,11 +3,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Http
 @using System.ComponentModel.DataAnnotations
+@using Split.Domain.Primitives
 @using Split.Domain.Transaction.Events
 @using System.Security.Claims
 @using Split.Domain.User
 @using Split.Domain.User.Events
 @using System.Diagnostics.CodeAnalysis
+@using Split.Application.Web.Components.Elements
+@rendermode InteractiveServer
 @attribute [Authorize]
 @inject IHttpContextAccessor httpContextAccessor
 @inject IMediator mediator
@@ -15,13 +18,11 @@
 <div class="simple-form">
     <h1>New Transaction</h1>
 
-    <EditForm EditContext="@editContext" FormName="NewTransactionForm" OnSubmit="SubmitHandler">
+    <EditForm EditContext="@editContext" FormName="NewTransactionForm" OnValidSubmit="ValidSubmitHandler">
+        <DataAnnotationsValidator />
         <p>
-            <label>
-                <span>Recipient</span>
-                <InputText @bind-Value="@model.Recipient" required placeholder />
-            </label>
-            <ValidationMessage For="@(() => model.Recipient)" />
+            <InputUsers Label="Recipients" @bind-Users="@model.Recipients" CurrentUser="currentUser" />
+            <ValidationMessage For="@(() => model.Recipients)" />
         </p>
         <p>
             <label>
@@ -56,6 +57,7 @@
     private EditContext editContext = default!;
     private ValidationMessageStore extraValidationMessageStore = default!;
     private bool transactionCompleted = false;
+    private UserId currentUser = null!;
 
     protected override void OnInitialized()
     {
@@ -63,54 +65,32 @@
         editContext = new(model);
         extraValidationMessageStore = new(editContext);
         editContext.OnFieldChanged += (_, _) => extraValidationMessageStore.Clear();
-    }
 
-    public async Task SubmitHandler()
-    {
         var userClaimId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
         if (userClaimId is null)
         {
             return;
         }
+        currentUser = new($"{userClaimId.Issuer}:{userClaimId.Value}");
+    }
 
-        if (await ValidateForm() is not UserAggregate recipient)
-        {
-            return;
-        }
-
+    public async Task ValidSubmitHandler()
+    {
         var request = new CreateTransactionRequest(
             new(model.Amount!.Value, new("SEK")),
             model.Description,
-            new($"{userClaimId.Issuer}:{userClaimId.Value}"),
-            [recipient.Id]
+            currentUser,
+            model.Recipients
         );
         await mediator.Send(request);
         transactionCompleted = true;
     }
 
-    private async Task<UserAggregate?> ValidateForm()
-    {
-        var restIsValid = editContext.Validate();
-
-        if (editContext.IsValid(() => model.Recipient!))
-        {
-            var recipientResponse = await mediator.Send(new PhoneNumberQuery(new(model.Recipient!)));
-            if (recipientResponse is { User: UserAggregate recipient } && restIsValid)
-            {
-                return recipient;
-            }
-
-            extraValidationMessageStore.Add(() => model.Recipient!, $"Recipient with phone number {model.Recipient!} not found.");
-        }
-
-        return null;
-    }
-
     public record TransactionForm
     {
         [Required(ErrorMessage = "Recipient is required.")]
-        [RegularExpression(@"^\+\d+$", ErrorMessage = "Recipient phone number must start with a '+' followed by only digits.")]
-        public string? Recipient { get; set; }
+        [MinLength(1, ErrorMessage = "At least one recipient must be selected.")]
+        public UserId[] Recipients { get; set; } = [];
 
         [Required(ErrorMessage = "Amount is required.")]
         [Range(double.Epsilon, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]

@@ -1,0 +1,19 @@
+.users {
+    min-height: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    gap: 1ch;
+}
+
+.users > span {
+    padding: 0.125rem 0.5rem;
+    background-color: var(--primary-color);
+    border-radius: 0.5rem;
+}
+
+.users > span::after {
+    content: "❌";
+    margin-inline-start: 1ch;
+    overflow: hidden;
+}

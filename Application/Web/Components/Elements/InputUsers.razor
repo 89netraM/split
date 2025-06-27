@@ -1,0 +1,138 @@
+@using Mediator
+@using Microsoft.Extensions.Logging
+@using Split.Domain.Primitives
+@using Split.Domain.User
+@using Split.Domain.User.Events
+@inject IMediator mediator
+
+<div class="users">
+    @foreach (var user in users)
+    {
+        <span @onclick="() => RemoveUser(user)">@user.DisplayName</span>
+    }
+</div>
+<label>
+    <span>@Label</span>
+    <input placeholder type="search" list="@relatedUsersDatalistId" @onkeypress="TypeUser" value="@searchString" @oninput="HandleInput">
+    <datalist id="@relatedUsersDatalistId">
+        @foreach (var user in relatedUsers)
+        {
+            <option value="@user.PhoneNumber">@user.Name</option>
+        }
+    </datalist>
+</label>
+
+@code {
+    [Parameter]
+    public UserId[] Users { get; set; } = [];
+
+    private List<AddedUser> users = [];
+
+    [Parameter]
+    public EventCallback<UserId[]>? UsersChanged { get; set; }
+
+    [Parameter]
+    public UserId? CurrentUser { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    private List<UserAggregate> relatedUsers = [];
+
+    private string searchString = "";
+
+    private Guid relatedUsersDatalistId = Guid.CreateVersion7();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (CurrentUser is not null)
+        {
+            relatedUsers = await mediator.CreateStream(new UserRelationshipQuery(CurrentUser))
+                .Select(r => r.User)
+                .ToListAsync();
+        }
+    }
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        searchString = e.Value as string ?? "";
+
+        if (relatedUsers.Find(u => u.PhoneNumber.Value == e.Value as string) is not { } user)
+        {
+            return;
+        }
+
+        if (users.FirstOrDefault(u => u.UserId == user.Id) is { } existingUser)
+        {
+            if (existingUser is PhoneNumberAddedUser)
+            {
+                users[users.IndexOf(existingUser)] = new RelationshipAddedUser(user.Id, user.Name);
+            }
+            await Task.Yield();
+            searchString = "";
+            return;
+        }
+
+        users.Add(new RelationshipAddedUser(user.Id, user.Name));
+        await Task.Yield();
+        searchString = "";
+        await UpdateUsers();
+    }
+
+    private async Task TypeUser(KeyboardEventArgs e)
+    {
+        if (e.Key is not "Enter")
+        {
+            return;
+        }
+
+        if (!PhoneNumberValidation.IsMatch(searchString))
+        {
+            return;
+        }
+
+        var result = await mediator.Send(new PhoneNumberQuery(new(searchString)));
+        if (result?.User is not { } user)
+        {
+            return;
+        }
+
+        if (users.Any(u => u.UserId == user.Id))
+        {
+            return;
+        }
+
+        users.Add(new PhoneNumberAddedUser(user.Id, user.PhoneNumber));
+        await Task.Yield();
+        searchString = "";
+        await UpdateUsers();
+    }
+
+    private async Task RemoveUser(AddedUser user)
+    {
+        users.Remove(user);
+        await UpdateUsers();
+    }
+
+    private async Task UpdateUsers()
+    {
+        Users = users.Select(u => u.UserId).ToArray();
+        if (UsersChanged.HasValue)
+        {
+            await UsersChanged.Value.InvokeAsync(Users);
+        }
+    }
+
+    private abstract record AddedUser(UserId UserId)
+    {
+        public abstract string DisplayName { get; }
+    }
+    private record PhoneNumberAddedUser(UserId UserId, PhoneNumber PhoneNumber) : AddedUser(UserId)
+    {
+        public override string DisplayName => PhoneNumber.Value;
+    }
+    private record RelationshipAddedUser(UserId UserId, string Name) : AddedUser(UserId)
+    {
+        public override string DisplayName => Name;
+    }
+}
