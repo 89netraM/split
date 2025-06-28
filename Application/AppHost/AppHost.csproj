@@ -5,6 +5,7 @@
     <UserSecretsId>7ff9e356-618d-48f6-83cc-3f920697ea5d</UserSecretsId>
     <RootNamespace>Split.Application.AppHost</RootNamespace>
     <AssemblyName>Split.Application.AppHost</AssemblyName>
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Web\Web.csproj" />
