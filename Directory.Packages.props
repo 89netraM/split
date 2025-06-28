@@ -13,6 +13,7 @@
   <!-- Dependencies -->
   <ItemGroup>
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.3.0" />
+    <PackageVersion Include="Aspire.Hosting.Docker" Version="9.3.1-preview.1.25305.6" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.3.0" />
     <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.0" />
     <PackageVersion Include="Mediator.Abstractions" Version="3.0.0-preview.65" />

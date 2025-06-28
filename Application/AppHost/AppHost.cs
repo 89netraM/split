@@ -10,6 +10,15 @@ builder
     .WithReference(database)
     .WaitFor(database)
     .WithExternalHttpEndpoints()
-    .WithHttpHealthCheck("/health");
+    .WithHttpHealthCheck("/health")
+    .PublishAsDockerFile(options =>
+        options
+            .WithDockerfile(contextPath: "../..", dockerfilePath: "./Application/Web/.containerfile")
+            .WithImageTag("split")
+    );
+
+builder
+    .AddDockerComposeEnvironment("docker-compose")
+    .ConfigureComposeFile(options => options.AddNetwork(new() { Name = "proxy", External = true }));
 
 builder.Build().Run();
