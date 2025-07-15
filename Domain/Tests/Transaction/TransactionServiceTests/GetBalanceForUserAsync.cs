@@ -292,6 +292,49 @@ public class GetBalanceForUserAsync
     }
 
     [TestMethod]
+    public async Task ReturnNothingBetweenRecipients_WhenSendingToTwoRecipients()
+    {
+        // Arrange
+        var timeProvider = new FakeTimeProvider(new(2025, 07, 15, 16, 08, 00, new(00, 00, 00)))
+        {
+            AutoAdvanceAmount = TimeSpan.FromMinutes(1),
+        };
+        var userA = new UserId("user-A");
+        var userB = new UserId("user-B");
+        var userC = new UserId("user-C");
+        var transaction = new TransactionAggregate(
+            "Test Transaction",
+            new(100, new("SEK")),
+            userA,
+            [userB, userC],
+            timeProvider.GetUtcNow()
+        );
+
+        var repository = new InMemoryTransactionRepository(transaction);
+
+        var transactionService = new TransactionService(
+            new NullLogger<TransactionService>(),
+            timeProvider,
+            repository,
+            new InMemoryUserRepository()
+        );
+
+        // Act
+        var result = await transactionService.GetBalanceForUserAsync(userB, CancellationToken.None);
+
+        // Assert
+        Assert.AreEqual(1, result.Length);
+        Assert.IsTrue(
+            result.Any(balance =>
+                balance.From == userA
+                && balance.To == userB
+                && balance.Amount.Amount == 50
+                && balance.Amount.Currency.Value == "SEK"
+            )
+        );
+    }
+
+    [TestMethod]
     public async Task ReturnMultipleBalancesForSameUserPair_WhenPairHasMadeTransactionsInMultipleCurrencies()
     {
         // Arrange

@@ -83,7 +83,8 @@ public class TransactionService(
             .GetTransactionsInvolvingUserAsync(userId, cancellationToken)
             .SelectMany(transaction =>
                 transaction
-                    .RecipientIds.Select(to =>
+                    .RecipientIds.Where(to => transaction.SenderId == userId || to == userId)
+                    .Select(to =>
                         transaction.SenderId == to
                             ? new Balance(to, transaction.SenderId, new(0.0m, transaction.Amount.Currency))
                             : new Balance(transaction.SenderId, to, transaction.Amount / transaction.RecipientIds.Count)
