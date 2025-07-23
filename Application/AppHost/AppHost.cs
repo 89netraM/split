@@ -17,6 +17,8 @@ builder
             .WithImageTag("split")
     );
 
+builder.AddProject<Projects.Api>("backend").WithExternalHttpEndpoints().WithHttpHealthCheck("/health");
+
 builder
     .AddDockerComposeEnvironment("docker-compose")
     .ConfigureComposeFile(options => options.AddNetwork(new() { Name = "proxy", External = true }));
