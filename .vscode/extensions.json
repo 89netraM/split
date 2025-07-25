@@ -1,7 +1,9 @@
 {
-    "recommendations": [
-        "csharpier.csharpier-vscode",
-        "ms-dotnettools.csdevkit",
-        "editorconfig.editorconfig"
-    ]
+  "recommendations": [
+    "csharpier.csharpier-vscode",
+    "ms-dotnettools.csdevkit",
+    "editorconfig.editorconfig",
+    "svelte.svelte-vscode",
+    "esbenp.prettier-vscode"
+  ]
 }

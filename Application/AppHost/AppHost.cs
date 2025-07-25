@@ -6,7 +6,7 @@ var postgres = builder.AddPostgres("postgres").WithPgAdmin().WithDataVolume("pos
 var database = postgres.AddDatabase("database");
 
 builder
-    .AddProject<Projects.Web>("frontend")
+    .AddProject<Projects.Web>("all-in-one-frontend")
     .WithReference(database)
     .WaitFor(database)
     .WithExternalHttpEndpoints()
@@ -17,7 +17,14 @@ builder
             .WithImageTag("split")
     );
 
-builder.AddProject<Projects.Api>("backend").WithExternalHttpEndpoints().WithHttpHealthCheck("/health");
+var backend = builder.AddProject<Projects.Api>("backend").WithHttpHealthCheck("/health");
+
+builder
+    .AddNpmApp("frontend", workingDirectory: "../Frontend", scriptName: "dev")
+    .WithReference(backend)
+    .WithHttpEndpoint(env: "PORT")
+    .WithExternalHttpEndpoints()
+    .PublishAsDockerFile();
 
 builder
     .AddDockerComposeEnvironment("docker-compose")
