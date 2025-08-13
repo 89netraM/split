@@ -13,10 +13,12 @@
     <ProjectReference Include="..\..\Domain\User\User.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Fido2.AspNet" />
     <PackageReference Include="Mediator.SourceGenerator">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
   </ItemGroup>
 </Project>
