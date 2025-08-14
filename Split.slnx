@@ -17,10 +17,12 @@
     <Project Path="Domain/Tests/Transaction/Transaction.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Encryptor/Encryptor.csproj" />
     <Project Path="Infrastructure/Repositories/Repositories.csproj" />
     <Project Path="Infrastructure/Swish/Swish.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/Tests/">
+    <Project Path="Infrastructure/Tests/Encryptor/Encryptor.csproj" />
     <Project Path="Infrastructure/Tests/Repositories/Repositories.csproj" />
     <Project Path="Infrastructure/Tests/Swish/Swish.csproj" />
   </Folder>
