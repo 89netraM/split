@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "HuaweiWifiSms.Grpc";
+
+package sms;
+
+service SmsSender {
+  // Sends a single SMS to a single recipient.
+  rpc SendSms (SmsRequest) returns (SmsResponse);
+}
+
+message SmsRequest {
+  // required
+  optional string recipient_phone_number = 1;
+  // required
+  optional string content = 2;
+}
+
+message SmsResponse {
+  // required
+  optional SmsStatus status = 1;
+}
+
+enum SmsStatus {
+  Unknown = 0;
+  Success = 1;
+  Failure = 2;
+}
