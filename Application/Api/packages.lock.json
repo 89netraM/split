@@ -45,18 +45,6 @@
           "Microsoft.OpenApi": "1.6.17"
         }
       },
-      "Fido2": {
-        "type": "Transitive",
-        "resolved": "3.0.1",
-        "contentHash": "S0Bz1vfcKlO4Jase3AWp5XnQ746psf4oGx5kL+D2A10j1SsjoAOAIIpanSwfi0cEepDHgk1bClcOKY5TjOzGdA==",
-        "dependencies": {
-          "Fido2.Models": "3.0.1",
-          "Microsoft.Extensions.Http": "6.0.0",
-          "NSec.Cryptography": "22.4.0",
-          "System.Formats.Cbor": "6.0.0",
-          "System.IdentityModel.Tokens.Jwt": "6.17.0"
-        }
-      },
       "Fido2.Models": {
         "type": "Transitive",
         "resolved": "3.0.1",
@@ -754,6 +742,7 @@
       "Split.Domain.User": {
         "type": "Project",
         "dependencies": {
+          "Fido2": "[3.0.1, )",
           "Mediator.Abstractions": "[3.0.0-preview.65, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.5, )",
           "Split.Domain.Primitives": "[1.0.0, )",
@@ -794,6 +783,19 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "Npgsql.OpenTelemetry": "9.0.3",
           "OpenTelemetry.Extensions.Hosting": "1.9.0"
+        }
+      },
+      "Fido2": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.1, )",
+        "resolved": "3.0.1",
+        "contentHash": "S0Bz1vfcKlO4Jase3AWp5XnQ746psf4oGx5kL+D2A10j1SsjoAOAIIpanSwfi0cEepDHgk1bClcOKY5TjOzGdA==",
+        "dependencies": {
+          "Fido2.Models": "3.0.1",
+          "Microsoft.Extensions.Http": "6.0.0",
+          "NSec.Cryptography": "22.4.0",
+          "System.Formats.Cbor": "6.0.0",
+          "System.IdentityModel.Tokens.Jwt": "6.17.0"
         }
       },
       "Mediator.Abstractions": {

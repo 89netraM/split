@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Split.Domain.Primitives;
-using Split.Infrastructure.Encryptor;
+using Split.Domain.User;
 
 namespace Split.Infrastructure.PhoneNumberVerifier.Services;
 
@@ -16,7 +16,7 @@ public sealed class PhoneNumberVerificationService(
     TimeProvider timeProvider,
     Random random,
     IOptions<PhoneNumberVerificationOptions> options,
-    EncryptionService encryptionService,
+    IEncryptionService encryptionService,
     CodeSenderService codeSenderService
 )
 {

@@ -4,6 +4,7 @@
     <AssemblyName>Split.Domain.User</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Fido2" />
     <PackageReference Include="Mediator.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="System.Linq.Async" />

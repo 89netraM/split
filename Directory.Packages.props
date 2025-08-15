@@ -25,6 +25,7 @@
     <PackageVersion Include="Aspire.Hosting.NodeJs" Version="9.3.1" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.3.0" />
     <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.0" />
+    <PackageVersion Include="Fido2" Version="3.0.1" />
     <PackageVersion Include="Fido2.AspNet" Version="3.0.1" />
     <PackageVersion Include="Google.Protobuf" Version="3.31.1" />
     <PackageVersion Include="Grpc.Net.ClientFactory" Version="2.71.0" />

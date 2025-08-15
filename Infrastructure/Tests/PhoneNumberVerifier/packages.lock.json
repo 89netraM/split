@@ -55,6 +55,11 @@
           "System.Diagnostics.EventLog": "6.0.0"
         }
       },
+      "Fido2.Models": {
+        "type": "Transitive",
+        "resolved": "3.0.1",
+        "contentHash": "mgjcuGETuYSCUEaZG+jQeeuuEMkDLc4GDJHBvKDdOz6oSOWp5adPdWP4btZx7Pi+9fu4szN3JIjJmby67MaILw=="
+      },
       "Grpc.Core.Api": {
         "type": "Transitive",
         "resolved": "2.71.0",
@@ -77,6 +82,11 @@
           "Grpc.Core.Api": "2.71.0"
         }
       },
+      "libsodium": {
+        "type": "Transitive",
+        "resolved": "1.0.18.2",
+        "contentHash": "flArHoVdscSzyV8ZdPV+bqqY2TTFlaN+xZf/vIqsmHI51KVcD/mOdUPaK3n/k/wGKz8dppiktXUqSmf3AXFgig=="
+      },
       "Microsoft.ApplicationInsights": {
         "type": "Transitive",
         "resolved": "2.23.0",
@@ -94,6 +104,11 @@
         "type": "Transitive",
         "resolved": "17.14.1",
         "contentHash": "pmTrhfFIoplzFVbhVwUquT+77CbGH+h4/3mBpdmIlYtBi9nAB+kKI6dN3A/nV4DFi3wLLx/BlHIPK+MkbQ6Tpg=="
+      },
+      "Microsoft.CSharp": {
+        "type": "Transitive",
+        "resolved": "4.5.0",
+        "contentHash": "kaj6Wb4qoMuH3HySFJhxwQfe8R/sJsNJnANrvv8WdFPMoNbKY5htfNscv+LHCu5ipz+49m2e+WQXpLXr9XYemQ=="
       },
       "Microsoft.DiaSymReader": {
         "type": "Transitive",
@@ -155,6 +170,29 @@
         "contentHash": "9+PnzmQFfEFNR9J2aDTfJGGupShHjOuGw4VUv+JB044biSHrnmCIMD+mJHmb2H7YryrfBEXDurxQ47gJZdCKNQ==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        }
+      },
+      "Microsoft.IdentityModel.JsonWebTokens": {
+        "type": "Transitive",
+        "resolved": "6.17.0",
+        "contentHash": "I3cSVE185qF3a222/iQIdmBFhrhZBtz7wZ1RUUbMuHC1un79XCI7vggbWdmbqIttFcUoeziemadO6t+3FLjcSA==",
+        "dependencies": {
+          "Microsoft.IdentityModel.Tokens": "6.17.0"
+        }
+      },
+      "Microsoft.IdentityModel.Logging": {
+        "type": "Transitive",
+        "resolved": "6.17.0",
+        "contentHash": "Ix6/CMLDoo939NDf1ARDuGK6YERY7pAX9WYbfwb4gZqx7r52unMFIykJk+zlEBX7jjtbDz/0uzikQFvheV9KsQ=="
+      },
+      "Microsoft.IdentityModel.Tokens": {
+        "type": "Transitive",
+        "resolved": "6.17.0",
+        "contentHash": "mhOe+d9BQg5U45TkTCyXAFOjl7RvwaFj6v9qo8b+WFolkuGsfjSFfQ+WI9D3ho9sD/fK75gvL4JptmjLzyUPkw==",
+        "dependencies": {
+          "Microsoft.CSharp": "4.5.0",
+          "Microsoft.IdentityModel.Logging": "6.17.0",
+          "System.Security.Cryptography.Cng": "4.5.0"
         }
       },
       "Microsoft.Testing.Extensions.CodeCoverage": {
@@ -268,6 +306,14 @@
         "resolved": "13.0.3",
         "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
+      "NSec.Cryptography": {
+        "type": "Transitive",
+        "resolved": "22.4.0",
+        "contentHash": "lEntcPYd7h3aZ8xxi/y/4TML7o8w0GEGqd+w4L1omqFLbdCBmhxJAeO2YBmv/fXbJKgKCQLm7+TD4bR605PEUQ==",
+        "dependencies": {
+          "libsodium": "[1.0.18.2, 1.0.19)"
+        }
+      },
       "System.Buffers": {
         "type": "Transitive",
         "resolved": "4.5.1",
@@ -291,6 +337,20 @@
         "resolved": "6.0.0",
         "contentHash": "lcyUiXTsETK2ALsZrX+nWuHSIQeazhqPphLfaRxzdGaG93+0kELqpgEHtwWOlQe7+jSFnKwaCAgL4kjeZCQJnw=="
       },
+      "System.Formats.Cbor": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "mGaLOoiw7KurJagOOcIsWUoCT5ACIiGxKlCcbYQASefBGXjnCcKTq5Hdjb94eEAKg38zXKlHw4c6EjzgBl9dIw=="
+      },
+      "System.IdentityModel.Tokens.Jwt": {
+        "type": "Transitive",
+        "resolved": "6.17.0",
+        "contentHash": "G3rY4WLr54Mo+97+AEq0ANpiKvW7E8Qu5bKWfVMa7rkyJtvrOxUqp/OLqrGw/6JDbD5GlxnAtFKukGteUuB0rQ==",
+        "dependencies": {
+          "Microsoft.IdentityModel.JsonWebTokens": "6.17.0",
+          "Microsoft.IdentityModel.Tokens": "6.17.0"
+        }
+      },
       "System.Memory": {
         "type": "Transitive",
         "resolved": "4.5.4",
@@ -309,6 +369,11 @@
         "resolved": "6.0.0",
         "contentHash": "/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg=="
       },
+      "System.Security.Cryptography.Cng": {
+        "type": "Transitive",
+        "resolved": "4.5.0",
+        "contentHash": "WG3r7EyjUe9CMPFSs6bty5doUqT+q9pbI80hlNzo2SkPkZ4VTuZkGWjpp77JB8+uaL4DFPRdBsAY+DX3dBK92A=="
+      },
       "System.Text.Encodings.Web": {
         "type": "Transitive",
         "resolved": "6.0.1",
@@ -325,22 +390,32 @@
       "Split.Domain.User": {
         "type": "Project",
         "dependencies": {
+          "Fido2": "[3.0.1, )",
           "Mediator.Abstractions": "[3.0.0-preview.65, )",
           "Microsoft.Extensions.Logging.Abstractions": "[9.0.5, )",
           "Split.Domain.Primitives": "[1.0.0, )",
           "System.Linq.Async": "[6.0.1, )"
         }
       },
-      "Split.Infrastructure.Encryptor": {
-        "type": "Project"
-      },
       "Split.Infrastructure.PhoneNumberVerifier": {
         "type": "Project",
         "dependencies": {
           "Google.Protobuf": "[3.31.1, )",
           "Grpc.Net.ClientFactory": "[2.71.0, )",
-          "Split.Domain.User": "[1.0.0, )",
-          "Split.Infrastructure.Encryptor": "[1.0.0, )"
+          "Split.Domain.User": "[1.0.0, )"
+        }
+      },
+      "Fido2": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.1, )",
+        "resolved": "3.0.1",
+        "contentHash": "S0Bz1vfcKlO4Jase3AWp5XnQ746psf4oGx5kL+D2A10j1SsjoAOAIIpanSwfi0cEepDHgk1bClcOKY5TjOzGdA==",
+        "dependencies": {
+          "Fido2.Models": "3.0.1",
+          "Microsoft.Extensions.Http": "6.0.0",
+          "NSec.Cryptography": "22.4.0",
+          "System.Formats.Cbor": "6.0.0",
+          "System.IdentityModel.Tokens.Jwt": "6.17.0"
         }
       },
       "Google.Protobuf": {

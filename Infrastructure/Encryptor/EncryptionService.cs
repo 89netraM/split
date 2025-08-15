@@ -4,10 +4,11 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Split.Domain.User;
 
 namespace Split.Infrastructure.Encryptor;
 
-public sealed class EncryptionService
+public sealed class EncryptionService : IEncryptionService
 {
     private readonly Aes aes;
 
@@ -44,7 +45,7 @@ public static class EncryptionServiceExtensions
         services.AddOptions<EncryptionOptions>().BindConfiguration("Encryption").ValidateOnStart();
         services.AddTransient<IValidateOptions<EncryptionOptions>, EncryptionOptionsValidator>();
 
-        services.AddSingleton<EncryptionService>();
+        services.AddSingleton<IEncryptionService, EncryptionService>();
 
         return services;
     }
