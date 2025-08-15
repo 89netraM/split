@@ -1,6 +1,9 @@
+using System;
 using HuaweiWifiSms.Grpc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Split.Infrastructure.Encryptor;
 using Split.Infrastructure.PhoneNumberVerifier.Services;
 
 namespace Split.Infrastructure.PhoneNumberVerifier;
@@ -14,6 +17,10 @@ public static class PhoneNumberVerifierServiceExtensions
         services.AddOptions<CodeSenderOptions>().BindConfiguration("CodeSender").ValidateOnStart();
         services.AddTransient<IValidateOptions<CodeSenderOptions>, CodeSenderOptionsValidator>();
         services.AddTransient<CodeSenderService>();
+
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddEncryptionService();
+        services.AddTransient<PhoneNumberVerificationService>();
 
         return services;
     }

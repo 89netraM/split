@@ -11,7 +11,7 @@ using Split.Domain.Primitives;
 
 namespace Split.Infrastructure.PhoneNumberVerifier.Services;
 
-internal sealed class CodeSenderService(
+public sealed class CodeSenderService(
     ILogger<CodeSenderService> logger,
     IHostEnvironment environment,
     IOptions<CodeSenderOptions> options,
@@ -48,7 +48,7 @@ internal sealed class CodeSenderService(
     }
 }
 
-internal sealed class CodeSenderOptions
+public sealed class CodeSenderOptions
 {
     [Required]
     public required string MessageFormat { get; set; }
