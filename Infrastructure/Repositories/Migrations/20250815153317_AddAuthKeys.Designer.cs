@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Split.Infrastructure.Repositories;
@@ -11,9 +12,11 @@ using Split.Infrastructure.Repositories;
 namespace Split.Infrastructure.Repositories.Migrations
 {
     [DbContext(typeof(SplitDbContext))]
-    partial class SplitDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250815153317_AddAuthKeys")]
+    partial class AddAuthKeys
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

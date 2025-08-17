@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Split.Domain.Primitives;
@@ -49,6 +50,11 @@ public class SplitDbContext(DbContextOptions<SplitDbContext> options) : DbContex
         userBuilder.HasIndex(u => u.PhoneNumber).IsUnique();
         userBuilder.Property(u => u.CreatedAt);
         userBuilder.Property(u => u.RemovedAt);
+
+        var authKeyBuilder = userBuilder.OwnsMany(u => u.AuthKeys);
+        authKeyBuilder.HasKey(k => k.Id);
+        authKeyBuilder.Property(k => k.Key);
+        authKeyBuilder.Property(k => k.SignCount);
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -60,6 +66,8 @@ public class SplitDbContext(DbContextOptions<SplitDbContext> options) : DbContex
         configurationBuilder.Properties<TransactionId>().HaveConversion<TransactionIdConverter>();
 
         configurationBuilder.Properties<Currency>().HaveConversion<CurrencyConverter>();
+
+        configurationBuilder.Properties<AuthKeyId>().HaveConversion<AuthKeyIdConverter>();
     }
 }
 
@@ -70,3 +78,5 @@ file class PhoneNumberConverter() : ValueConverter<PhoneNumber, string>(v => v.V
 file class TransactionIdConverter() : ValueConverter<TransactionId, Guid>(v => v.Value, v => new TransactionId(v));
 
 file class CurrencyConverter() : ValueConverter<Currency, string>(v => v.Value, v => new Currency(v));
+
+file class AuthKeyIdConverter() : ValueConverter<AuthKeyId, string>(v => v.Value, v => new AuthKeyId(v));

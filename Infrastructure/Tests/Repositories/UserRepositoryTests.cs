@@ -2,11 +2,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Split.Domain.Primitives;
-using Split.Domain.Transaction;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 
@@ -98,5 +96,94 @@ public class UserRepositoryTests : PostgresTestBase
         var domainEvents = user.FlushDomainEvents();
         Assert.IsEmpty(domainEvents);
         await Mediator.Received(1).Publish(Arg.Any<UserCreatedEvent>(), Arg.Any<CancellationToken>());
+    }
+
+    [TestMethod]
+    public async Task ASavedUserWithAnAuthKeyShouldHaveItsAuthKeyWhenRetrievedById()
+    {
+        // Arrange
+        var userRepository = Services.GetRequiredService<IUserRepository>();
+        var user = new UserAggregate(
+            new("user-id"),
+            "Test User",
+            new("+9123456789"),
+            new(2025, 08, 15, 14, 32, 00, new(00, 00, 00))
+        );
+        user.AddAuthKey(new("auth-key-id"), [0x12], 2);
+        var authKey = user.AuthKeys.Single();
+
+        // Act
+        await userRepository.SaveAsync(user, CancellationToken.None);
+        var result = await userRepository.GetUserByIdAsync(user.Id, CancellationToken.None);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.ContainsSingle(result.AuthKeys);
+        var retrievedAuthKey = result.AuthKeys.Single();
+        Assert.AreEqual(authKey.Id, retrievedAuthKey.Id);
+        Assert.AreEqual(authKey.Key, retrievedAuthKey.Key);
+        Assert.AreEqual(authKey.SignCount, retrievedAuthKey.SignCount);
+    }
+
+    [TestMethod]
+    public async Task DoesAuthKeyExistShouldReturnFalseWhenNoAuthKeysExist()
+    {
+        // Arrange
+        var userRepository = Services.GetRequiredService<IUserRepository>();
+        var user = new UserAggregate(
+            new("user-id"),
+            "Test User",
+            new("+9123456789"),
+            new(2025, 08, 15, 14, 32, 00, new(00, 00, 00))
+        );
+
+        // Act
+        await userRepository.SaveAsync(user, CancellationToken.None);
+        var result = await userRepository.DoesAuthKeyIdExist(new("auth-key-id"), CancellationToken.None);
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public async Task DoesAuthKeyExistShouldReturnFalseWhenTheAuthKeyDoesNotExistButOtherDo()
+    {
+        // Arrange
+        var userRepository = Services.GetRequiredService<IUserRepository>();
+        var user = new UserAggregate(
+            new("user-id"),
+            "Test User",
+            new("+9123456789"),
+            new(2025, 08, 15, 14, 32, 00, new(00, 00, 00))
+        );
+        user.AddAuthKey(new("auth-key-id"), [0x12], 2);
+
+        // Act
+        await userRepository.SaveAsync(user, CancellationToken.None);
+        var result = await userRepository.DoesAuthKeyIdExist(new("another-auth-key-id"), CancellationToken.None);
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public async Task DoesAuthKeyExistShouldReturnTrueWhenTheAuthKeyExists()
+    {
+        // Arrange
+        var userRepository = Services.GetRequiredService<IUserRepository>();
+        var user = new UserAggregate(
+            new("user-id"),
+            "Test User",
+            new("+9123456789"),
+            new(2025, 08, 15, 14, 32, 00, new(00, 00, 00))
+        );
+        user.AddAuthKey(new("auth-key-id"), [0x12], 2);
+
+        // Act
+        await userRepository.SaveAsync(user, CancellationToken.None);
+        var result = await userRepository.DoesAuthKeyIdExist(new("auth-key-id"), CancellationToken.None);
+
+        // Assert
+        Assert.IsTrue(result);
     }
 }

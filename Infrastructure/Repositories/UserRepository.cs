@@ -18,6 +18,11 @@ public class UserRepository(SplitDbContext dbContext, IMediator mediator) : IUse
         CancellationToken cancellationToken
     ) => await dbContext.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber, cancellationToken);
 
+    public async Task<bool> DoesAuthKeyIdExist(AuthKeyId authKeyId, CancellationToken cancellationToken) =>
+        await dbContext
+            .Users.AsNoTracking()
+            .AnyAsync(u => u.AuthKeys.Any(k => k.Id == authKeyId), cancellationToken: cancellationToken);
+
     public async Task SaveAsync(UserAggregate user, CancellationToken cancellationToken)
     {
         if (dbContext.Entry(user) is null or { State: EntityState.Detached })

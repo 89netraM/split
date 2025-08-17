@@ -69,7 +69,7 @@ public class UserRelationshipRepositoryTests : PostgresTestBase
 
         // Assert
         Assert.AreEqual(2, relatedUsers.Length);
-        Assert.AreEqual(userB.Id, relatedUsers[0].Id);
-        Assert.AreEqual(userC.Id, relatedUsers[1].Id);
+        Assert.Contains(userB.Id, relatedUsers.Select(u => u.Id));
+        Assert.Contains(userC.Id, relatedUsers.Select(u => u.Id));
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Mediator;
 using Split.Domain.Primitives;
 using Split.Domain.User.Events;
@@ -11,6 +12,7 @@ public class UserAggregate
     public UserId Id { get; }
     public string Name { get; }
     public PhoneNumber PhoneNumber { get; }
+    public ICollection<AuthKeyEntity> AuthKeys { get; }
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset? RemovedAt { get; private set; }
 
@@ -21,6 +23,7 @@ public class UserAggregate
         Id = id;
         Name = name;
         PhoneNumber = phoneNumber;
+        AuthKeys = [];
         CreatedAt = createdAt;
         domainEvents.Add(new UserCreatedEvent(this));
     }
@@ -30,6 +33,17 @@ public class UserAggregate
     public UserAggregate() { }
 
 #nullable restore
+
+    public void AddAuthKey(AuthKeyId id, byte[] key, uint counter)
+    {
+        if (AuthKeys.Any(k => k.Id == id))
+        {
+            return;
+        }
+
+        AuthKeys.Add(new(id, key, counter));
+        domainEvents.Add(new UserAuthKeyAddedEvent(this, id));
+    }
 
     public void Remove(DateTimeOffset removedAt)
     {
