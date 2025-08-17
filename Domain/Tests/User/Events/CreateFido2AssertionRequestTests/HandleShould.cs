@@ -12,7 +12,7 @@ using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 
-namespace Split.Domain.Tests.User.Events.CreateFido2AssertionRequestHandlerTests;
+namespace Split.Domain.Tests.User.Events.CreateFido2AssertionRequestTests;
 
 [TestClass]
 public class HandleShould

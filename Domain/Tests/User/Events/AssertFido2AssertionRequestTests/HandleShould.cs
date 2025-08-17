@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +13,7 @@ using Split.Domain.Tests.TestCommon;
 using Split.Domain.User;
 using Split.Domain.User.Events;
 
-namespace Split.Domain.Tests.User.Events.AssertFido2AssertionRequestHandlerTests;
+namespace Split.Domain.Tests.User.Events.AssertFido2AssertionRequestTests;
 
 [TestClass]
 public class HandleShould
