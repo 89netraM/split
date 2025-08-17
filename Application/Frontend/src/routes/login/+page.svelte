@@ -1,34 +1,46 @@
 <script lang="ts">
   let phoneNumber = $state("");
+  let token: string | null = $state(null);
 
   async function onsubmit(e: SubmitEvent) {
-    const { context, options } = await fetch(`http://localhost:5223/api/auth/assertion?phoneNumber=${phoneNumber}`).then((r) => r.json());
-    const assertion = await navigator.credentials.get({ publicKey: PublicKeyCredential.parseRequestOptionsFromJSON(options) });
-    if (!(assertion instanceof PublicKeyCredential)) {
+    const { assertion, assertionContext } = await fetch(
+      `http://localhost:5223/api/auth/assertion?phoneNumber=${encodeURIComponent(phoneNumber)}`,
+    ).then((r) => r.json());
+    const assertionResult = await navigator.credentials.get({
+      publicKey: PublicKeyCredential.parseRequestOptionsFromJSON(assertion),
+    });
+    if (!(assertionResult instanceof PublicKeyCredential)) {
       alert("Not public key credentials");
       return;
     }
-    const response = await fetch("http://localhost:5223/api/auth/assertion", {
+    const { token: t } = await fetch("http://localhost:5223/api/auth/assertion", {
       method: "POST",
-      body: JSON.stringify({ context, assertion }),
+      body: JSON.stringify({
+        assertion: assertionResult,
+        context: assertionContext,
+      }),
       mode: "cors",
       headers: {
         "Content-Type": "application/json",
       },
-    })
-    console.log(await response.json());
+    }).then(r => r.json());
+    token = t;
   }
 </script>
 
-<form {onsubmit}>
-  <label>
-    <input
-      type="tel"
-      bind:value={phoneNumber}
-      pattern="\+46 7\d-\d\d\d \d\d \d\d"
-      required
-      placeholder="+46 7X-XXX XX XX"
-    />
-  </label>
-  <button type="submit">Login with a Passkey</button>
-</form>
+{#if token == null}
+  <form {onsubmit}>
+    <label>
+      <input
+        type="tel"
+        bind:value={phoneNumber}
+        pattern="^\+467\d{'{'}8{'}'}$"
+        required
+        placeholder="+467XXXXXXXX"
+      />
+    </label>
+    <button type="submit">Login with a Passkey</button>
+  </form>
+{:else}
+  <p>Your token: <code>{token}</code></p>
+{/if}

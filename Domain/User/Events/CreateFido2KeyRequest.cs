@@ -8,7 +8,7 @@ namespace Split.Domain.User.Events;
 public sealed record CreateFido2KeyRequest(AuthenticatorAttestationRawResponse Attestation, string ChallengeContext)
     : IRequest<CreateFido2KeyResponse>;
 
-public sealed record CreateFido2KeyResponse();
+public sealed record CreateFido2KeyResponse(UserAggregate User);
 
 public record CreateFido2KeyRequestHandler(AuthService authService)
     : IRequestHandler<CreateFido2KeyRequest, CreateFido2KeyResponse>
@@ -18,7 +18,7 @@ public record CreateFido2KeyRequestHandler(AuthService authService)
         CancellationToken cancellationToken
     )
     {
-        await authService.CreateAuthKey(request.Attestation, request.ChallengeContext, cancellationToken);
-        return new();
+        var user = await authService.CreateAuthKey(request.Attestation, request.ChallengeContext, cancellationToken);
+        return new(user);
     }
 }

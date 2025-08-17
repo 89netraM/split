@@ -1,3 +1,4 @@
+using System;
 using Fido2NetLib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -5,6 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Split.Application.Api;
+using Split.Domain.Transaction;
+using Split.Domain.User;
+using Split.Infrastructure.Encryptor;
+using Split.Infrastructure.PhoneNumberVerifier;
+using Split.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +18,15 @@ builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddEncryptionService();
+builder.Services.AddRepositories();
+
+builder.Services.AddEncryptionService().AddPhoneNumberVerifierServices();
+
+builder.Services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
+
+builder.Services.AddSingleton(TimeProvider.System).AddSingleton(Random.Shared);
+
+builder.Services.AddTransient<UserService>().AddTransient<TransactionService>().AddTransient<AuthService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 builder.Services.AddJwtService();

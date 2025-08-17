@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Fido2NetLib;
-using Fido2NetLib.Objects;
+using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Split.Domain.Primitives;
+using Split.Domain.User.Events;
 
 namespace Split.Application.Api;
 
@@ -20,137 +19,163 @@ public static class Auth
     {
         var group = routeBuilder.MapGroup("/auth");
 
-        group.MapGet("/credential", GetCreationChallenge);
-        group.MapPost("/credential", CreateCredential);
+        group.MapGet("/verify-phone-number", RequestPhoneNumberVerification).Produces<VerifyPhoneNumberResponse>();
+        group.MapPost("/credential", GetCredentialChallenge).Produces<GetCreationChallengeResponse>();
+        group.MapPost("/credential/new", CreateNewUser).Produces<CreateNewUserResponse>();
+        group.MapPost("/credential/existing", CreateExistingUser).Produces<CreateExistingUserResponse>();
 
-        group.MapGet("/assertion", GetAssertionChallenge);
-        group.MapPost("/assertion", Assert);
+        group.MapGet("/assertion", GetAssertionChallenge).Produces<GetAssertionChallengeResponse>();
+        group.MapPost("/assertion", Assert).Produces<AssertResponse>();
 
         return group;
     }
 
-    private const string Fido2CredentialSessionKey = nameof(Fido2CredentialSessionKey);
-    private const string Fido2AssertionSessionKey = nameof(Fido2AssertionSessionKey);
-
-    private static IResult GetCreationChallenge(
-        [FromServices] IFido2 fido2,
-        [FromServices] EncryptionService encryptionService,
-        [FromQuery] string phoneNumber
-    )
-    {
-        var options = fido2.RequestNewCredential(
-            user: new()
-            {
-                DisplayName = phoneNumber,
-                Id = Encoding.UTF8.GetBytes(phoneNumber),
-                Name = phoneNumber,
-            },
-            excludeCredentials: [],
-            authenticatorSelection: new() { UserVerification = UserVerificationRequirement.Required },
-            attestationPreference: AttestationConveyancePreference.Direct
-        );
-
-        return Results.Json(new GetCreationChallengeResponse(encryptionService.Encrypt(options.ToJson()), options));
-    }
-
-    private static async Task<IResult> CreateCredential(
-        [FromServices] IFido2 fido2,
-        [FromServices] EncryptionService encryptionService,
-        [FromBody] CreateCredentialRequest request,
+    private static async Task<IResult> RequestPhoneNumberVerification(
+        [FromServices] ISender sender,
+        [FromQuery] string phoneNumber,
         CancellationToken cancellationToken
     )
     {
-        var createOptions = CredentialCreateOptions.FromJson(encryptionService.Decrypt(request.Context));
+        try
+        {
+            var response = await sender.Send(new PhoneNumberVerificationRequest(new(phoneNumber)), cancellationToken);
 
-        var credentialResult = await fido2.MakeNewCredentialAsync(
-            request.Attestation,
-            createOptions,
-            isCredentialIdUniqueToUser: (_, _) => Task.FromResult(true),
-            cancellationToken: cancellationToken
-        );
-        if (credentialResult.Result is not { } credential)
+            return Results.Json(new VerifyPhoneNumberResponse(response.VerificationContext));
+        }
+        catch (PhoneNumberFormatException)
         {
             return Results.BadRequest();
         }
-        var user = Users[credential.User.Name] = Users.GetValueOrDefault(credential.User.Name, []);
-        user[Convert.ToBase64String(credential.CredentialId)] = (credential.PublicKey, credential.Counter);
-        return Results.Ok();
     }
 
-    private static IResult GetAssertionChallenge(
-        [FromServices] IFido2 fido2,
-        [FromServices] EncryptionService encryptionService,
+    private static async Task<IResult> GetCredentialChallenge(
+        [FromServices] ISender sender,
+        [FromBody] GetCreationChallengeRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        var response = await sender.Send(
+            new CreateFido2ChallengeRequest(
+                request.PhoneNumberVerificationCode,
+                request.PhoneNumberVerificationContext
+            ),
+            cancellationToken
+        );
+        if (response.Result is null)
+        {
+            return Results.Unauthorized();
+        }
+        return Results.Json(
+            new GetCreationChallengeResponse(
+                response.Result.ChallengeContext,
+                response.Result.Challenge,
+                response.Result.UserExists
+            )
+        );
+    }
+
+    private static async Task<IResult> CreateNewUser(
+        [FromServices] ISender sender,
+        [FromServices] JwtService jwtService,
+        [FromBody] CreateNewUserRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        var response = await sender.Send(
+            new CreateFido2KeyAndUserRequest(request.Attestation, request.ChallengeContext, request.UserName),
+            cancellationToken
+        );
+        var token = jwtService.GenerateToken(response.User);
+        return Results.Json(new CreateNewUserResponse(token));
+    }
+
+    private static async Task<IResult> CreateExistingUser(
+        [FromServices] ISender sender,
+        [FromServices] JwtService jwtService,
+        [FromBody] CreateExistingUserRequest request,
+        CancellationToken cancellationToken
+    )
+    {
+        var response = await sender.Send(
+            new CreateFido2KeyRequest(request.Attestation, request.ChallengeContext),
+            cancellationToken
+        );
+        var token = jwtService.GenerateToken(response.User);
+        return Results.Json(new CreateExistingUserResponse(token));
+    }
+
+    private static async Task<IResult> GetAssertionChallenge(
+        [FromServices] ISender sender,
         [FromQuery] string phoneNumber
     )
     {
-        var options = fido2.GetAssertionOptions(
-            Users[phoneNumber].Keys.Select(p => new PublicKeyCredentialDescriptor(Convert.FromBase64String(p))),
-            UserVerificationRequirement.Discouraged
-        );
-        return Results.Json(new GetAssertionChallengeResponse(encryptionService.Encrypt(options.ToJson()), options));
+        try
+        {
+            var response = await sender.Send(new CreateFido2AssertionRequest(new(phoneNumber)));
+            return Results.Json(new GetAssertionChallengeResponse(response.Assertion, response.AssertionContext));
+        }
+        catch (PhoneNumberFormatException)
+        {
+            return Results.BadRequest();
+        }
     }
 
     private static async Task<IResult> Assert(
-        [FromServices] IFido2 fido2,
-        [FromServices] EncryptionService encryptionService,
+        [FromServices] ISender sender,
         [FromServices] JwtService jwtService,
         [FromBody] AssertRequest request,
         CancellationToken cancellationToken
     )
     {
-        var assertionOptions = AssertionOptions.FromJson(encryptionService.Decrypt(request.Context));
-        var user = Users.Values.FirstOrDefault(u => u.ContainsKey(Convert.ToBase64String(request.Assertion.RawId)));
-        if (user is null)
-        {
-            return Results.NotFound();
-        }
-        var credential = user[Convert.ToBase64String(request.Assertion.RawId)];
-        var assertion = await fido2.MakeAssertionAsync(
-            request.Assertion,
-            assertionOptions,
-            credential.Item1,
-            credential.Item2,
-            isUserHandleOwnerOfCredentialIdCallback: (_, cts) => Task.FromResult(true),
-            cancellationToken: cancellationToken
+        var response = await sender.Send(
+            new AssertFido2AssertionRequest(request.Assertion, request.Context),
+            cancellationToken
         );
-        user[Convert.ToBase64String(request.Assertion.RawId)] = (credential.Item1, assertion.Counter);
-        return Results.Json(
-            new AssertResponse(
-                jwtService.GenerateToken(
-                    new(
-                        new(Convert.ToBase64String(request.Assertion.RawId)),
-                        "Mårten Åsberg",
-                        new("+46722177038"),
-                        DateTimeOffset.UtcNow
-                    )
-                )
-            )
-        );
+        var token = jwtService.GenerateToken(response.User);
+        return Results.Json(new AssertResponse(token));
     }
 
     private static readonly Dictionary<string, Dictionary<string, (byte[], uint)>> Users = [];
 }
 
 [JsonSerializable(typeof(GetCreationChallengeResponse))]
-[JsonSerializable(typeof(CreateCredentialRequest))]
-[JsonSerializable(typeof(GetAssertionChallengeResponse))]
+[JsonSerializable(typeof(CreateNewUserRequest))]
+[JsonSerializable(typeof(CreateNewUserResponse))]
 [JsonSerializable(typeof(AssertRequest))]
 [JsonSerializable(typeof(AssertResponse))]
 public sealed partial class AuthSerializerContext : JsonSerializerContext;
 
+public sealed record VerifyPhoneNumberResponse([property: JsonPropertyName("context")] string Context);
+
+public sealed record GetCreationChallengeRequest(
+    [property: JsonPropertyName("phoneNumberVerificationCode")] string PhoneNumberVerificationCode,
+    [property: JsonPropertyName("phoneNumberVerificationContext")] string PhoneNumberVerificationContext
+);
+
 public sealed record GetCreationChallengeResponse(
     [property: JsonPropertyName("context")] string Context,
-    [property: JsonPropertyName("options")] CredentialCreateOptions Options
+    [property: JsonPropertyName("options")] CredentialCreateOptions Options,
+    [property: JsonPropertyName("userExists")] bool UserExists
 );
 
-public sealed record CreateCredentialRequest(
-    [property: JsonPropertyName("context")] string Context,
-    [property: JsonPropertyName("attestation")] AuthenticatorAttestationRawResponse Attestation
+public sealed record CreateNewUserRequest(
+    [property: JsonPropertyName("attestation")] AuthenticatorAttestationRawResponse Attestation,
+    [property: JsonPropertyName("challengeContext")] string ChallengeContext,
+    [property: JsonPropertyName("userName")] string UserName
 );
+
+public sealed record CreateNewUserResponse([property: JsonPropertyName("token")] string Token);
+
+public sealed record CreateExistingUserRequest(
+    [property: JsonPropertyName("attestation")] AuthenticatorAttestationRawResponse Attestation,
+    [property: JsonPropertyName("challengeContext")] string ChallengeContext
+);
+
+public sealed record CreateExistingUserResponse([property: JsonPropertyName("token")] string Token);
 
 public sealed record GetAssertionChallengeResponse(
-    [property: JsonPropertyName("context")] string Context,
-    [property: JsonPropertyName("options")] AssertionOptions Options
+    [property: JsonPropertyName("assertion")] AssertionOptions Assertion,
+    [property: JsonPropertyName("assertionContext")] string Context
 );
 
 public sealed record AssertRequest(

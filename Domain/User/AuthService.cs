@@ -58,7 +58,7 @@ public sealed class AuthService(
             )
         );
 
-    internal async Task CreateUserAndAuthKey(
+    internal async Task<UserAggregate> CreateUserAndAuthKey(
         AuthenticatorAttestationRawResponse attestation,
         string challengeContext,
         UserCreationInformation userInfo,
@@ -78,7 +78,7 @@ public sealed class AuthService(
             cancellationToken
         );
 
-    internal async Task CreateAuthKey(
+    internal async Task<UserAggregate> CreateAuthKey(
         AuthenticatorAttestationRawResponse attestation,
         string challengeContext,
         CancellationToken cancellationToken
@@ -93,7 +93,7 @@ public sealed class AuthService(
             cancellationToken
         );
 
-    private async Task CreateAuthKey(
+    private async Task<UserAggregate> CreateAuthKey(
         AuthenticatorAttestationRawResponse attestation,
         string challengeContext,
         Func<UserAggregate?, ChallengeContext, CancellationToken, Task<UserAggregate>> ensureUser,
@@ -119,6 +119,8 @@ public sealed class AuthService(
 
         user.AddAuthKey(new(Convert.ToBase64String(credential.CredentialId)), credential.PublicKey, credential.Counter);
         await userRepository.SaveAsync(user, cancellationToken);
+
+        return user;
     }
 
     private ChallengeContext DecodeChallengeContext(string challengeContext) =>
@@ -152,7 +154,7 @@ public sealed class AuthService(
             )
         );
 
-    internal async Task AssertAssertion(
+    internal async Task<UserAggregate> AssertAssertion(
         AuthenticatorAssertionRawResponse assertionResponse,
         string assertionContext,
         CancellationToken cancellationToken
@@ -176,6 +178,8 @@ public sealed class AuthService(
         );
         authKey.IncreaseSignCount(assertion.Counter);
         await userRepository.SaveAsync(user, cancellationToken);
+
+        return user;
     }
 
     private AssertionContext DecodeAssertionContext(string context) =>

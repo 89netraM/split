@@ -10,7 +10,7 @@ public sealed record AssertFido2AssertionRequest(
     string AssertionContext
 ) : IRequest<AssertFido2AssertionResponse>;
 
-public sealed record AssertFido2AssertionResponse();
+public sealed record AssertFido2AssertionResponse(UserAggregate User);
 
 public sealed class AssertFido2AssertionRequestHandler(AuthService authService)
     : IRequestHandler<AssertFido2AssertionRequest, AssertFido2AssertionResponse>
@@ -20,7 +20,11 @@ public sealed class AssertFido2AssertionRequestHandler(AuthService authService)
         CancellationToken cancellationToken
     )
     {
-        await authService.AssertAssertion(request.AssertionResponse, request.AssertionContext, cancellationToken);
-        return new();
+        var user = await authService.AssertAssertion(
+            request.AssertionResponse,
+            request.AssertionContext,
+            cancellationToken
+        );
+        return new(user);
     }
 }

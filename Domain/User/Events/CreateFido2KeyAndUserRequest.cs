@@ -11,7 +11,7 @@ public sealed record CreateFido2KeyAndUserRequest(
     string UserName
 ) : IRequest<CreateFido2KeyAndUserResponse>;
 
-public sealed record CreateFido2KeyAndUserResponse();
+public sealed record CreateFido2KeyAndUserResponse(UserAggregate User);
 
 public record CreateFido2KeyAndUserRequestHandler(AuthService authService)
     : IRequestHandler<CreateFido2KeyAndUserRequest, CreateFido2KeyAndUserResponse>
@@ -21,12 +21,12 @@ public record CreateFido2KeyAndUserRequestHandler(AuthService authService)
         CancellationToken cancellationToken
     )
     {
-        await authService.CreateUserAndAuthKey(
+        var user = await authService.CreateUserAndAuthKey(
             request.Attestation,
             request.ChallengeContext,
             new(request.UserName),
             cancellationToken
         );
-        return new();
+        return new(user);
     }
 }
