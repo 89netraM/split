@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -45,15 +46,15 @@ public sealed class AuthService(
             authenticatorSelection: new() { UserVerification = UserVerificationRequirement.Required },
             attestationPreference: AttestationConveyancePreference.Direct
         );
-        var context = CreateContext(challenge, verificationResponse.PhoneNumber);
+        var context = CreateChallengeContext(challenge, verificationResponse.PhoneNumber);
         return new(challenge, context, user is not null);
     }
 
-    private string CreateContext(CredentialCreateOptions challenge, PhoneNumber phoneNumber) =>
+    private string CreateChallengeContext(CredentialCreateOptions challenge, PhoneNumber phoneNumber) =>
         encryptionService.Encrypt(
             JsonSerializer.Serialize(
                 new ChallengeContext(challenge, phoneNumber),
-                ChallengeContextJsonSerializerContext.Default.ChallengeContext
+                ContextJsonSerializerContext.Default.ChallengeContext
             )
         );
 
@@ -99,7 +100,7 @@ public sealed class AuthService(
         CancellationToken cancellationToken
     )
     {
-        var context = DecodeContext(challengeContext);
+        var context = DecodeChallengeContext(challengeContext);
         var userId = new UserId(Encoding.UTF8.GetString(context.Challenge.User.Id));
         var user = await userRepository.GetUserByIdAsync(userId, cancellationToken);
         var credentialResult = await fido2.MakeNewCredentialAsync(
@@ -120,11 +121,68 @@ public sealed class AuthService(
         await userRepository.SaveAsync(user, cancellationToken);
     }
 
-    private ChallengeContext DecodeContext(string challengeContext) =>
+    private ChallengeContext DecodeChallengeContext(string challengeContext) =>
         JsonSerializer.Deserialize(
             encryptionService.Decrypt(challengeContext),
-            ChallengeContextJsonSerializerContext.Default.ChallengeContext
+            ContextJsonSerializerContext.Default.ChallengeContext
         ) ?? throw new CreateUserAuthKeyContextNullException();
+
+    internal async Task<AssertionChallenge> CreateAssertion(
+        PhoneNumber phoneNumber,
+        CancellationToken cancellationToken
+    )
+    {
+        var user =
+            await userService.GetUserByPhoneNumberAsync(phoneNumber, cancellationToken)
+            ?? throw new MissingUserException(phoneNumber);
+
+        var assertion = fido2.GetAssertionOptions(
+            user.AuthKeys.Select(k => new PublicKeyCredentialDescriptor(Convert.FromBase64String(k.Id.Value))),
+            UserVerificationRequirement.Discouraged
+        );
+
+        return new(assertion, CreateAssertionContext(assertion, user.Id));
+    }
+
+    private string CreateAssertionContext(AssertionOptions assertion, UserId userId) =>
+        encryptionService.Encrypt(
+            JsonSerializer.Serialize(
+                new AssertionContext(assertion, userId),
+                ContextJsonSerializerContext.Default.AssertionContext
+            )
+        );
+
+    internal async Task AssertAssertion(
+        AuthenticatorAssertionRawResponse assertionResponse,
+        string assertionContext,
+        CancellationToken cancellationToken
+    )
+    {
+        var context = DecodeAssertionContext(assertionContext);
+        var user =
+            await userService.GetUserAsync(context.UserId, cancellationToken)
+            ?? throw new MissingUserException(context.UserId);
+        var authKeyId = new AuthKeyId(Convert.ToBase64String(assertionResponse.RawId));
+        var authKey =
+            user.AuthKeys.FirstOrDefault(k => k.Id == authKeyId) ?? throw new MissingKeyException(authKeyId, user.Id);
+        var assertion = await fido2.MakeAssertionAsync(
+            assertionResponse,
+            context.Assertion,
+            authKey.Key,
+            authKey.SignCount,
+            isUserHandleOwnerOfCredentialIdCallback: (param, _) =>
+                Task.FromResult(new UserId(Encoding.UTF8.GetString(param.UserHandle)) == user.Id),
+            cancellationToken: cancellationToken
+        );
+        authKey.IncreaseSignCount(assertion.Counter);
+        await userRepository.SaveAsync(user, cancellationToken);
+    }
+
+    private AssertionContext DecodeAssertionContext(string context) =>
+        JsonSerializer.Deserialize(
+            encryptionService.Decrypt(context),
+            ContextJsonSerializerContext.Default.AssertionContext
+        ) ?? throw new AssertUserAuthKeyContextNullException();
 }
 
 internal sealed record ChallengeCreationResult(
@@ -137,14 +195,31 @@ internal sealed record UserCreationInformation(string Name);
 
 internal sealed record ChallengeContext(CredentialCreateOptions Challenge, PhoneNumber PhoneNumber);
 
+internal sealed record AssertionChallenge(AssertionOptions Assertion, string AssertionContext);
+
+internal sealed record AssertionContext(AssertionOptions Assertion, UserId UserId);
+
 [JsonSerializable(typeof(ChallengeContext))]
-internal sealed partial class ChallengeContextJsonSerializerContext : JsonSerializerContext;
+[JsonSerializable(typeof(AssertionContext))]
+internal sealed partial class ContextJsonSerializerContext : JsonSerializerContext;
 
 internal sealed class CreateUserAuthKeyContextNullException()
     : Exception("Deserializing decrypted context returned null.");
 
-internal sealed class MissingUserException(PhoneNumber phoneNumber)
-    : Exception($"User missing for phone number {phoneNumber.Value} when adding auth key.");
+internal sealed class AssertUserAuthKeyContextNullException()
+    : Exception("Deserializing decrypted context returned null.");
+
+internal sealed class MissingUserException : Exception
+{
+    public MissingUserException(PhoneNumber phoneNumber)
+        : base($"User missing for phone number {phoneNumber.Value}.") { }
+
+    public MissingUserException(UserId userId)
+        : base($"User missing for id {userId.Value}.") { }
+}
 
 internal sealed class CredentialCreationFailedException(string errorMessage, PhoneNumber phoneNumber)
     : Exception($"Credential creation failed with message \"{errorMessage}\" for phone number {phoneNumber.Value}.");
+
+internal sealed class MissingKeyException(AuthKeyId authKeyId, UserId userId)
+    : Exception($"No key with id {authKeyId.Value} exists on user {userId.Value}.");
