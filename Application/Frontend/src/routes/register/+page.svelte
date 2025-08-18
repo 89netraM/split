@@ -11,14 +11,14 @@
 
   async function onSubmitPhoneNumber() {
     const { context } = await fetch(
-      `./api/auth/verify-phone-number?phoneNumber=${encodeURIComponent(phoneNumber)}`,
+      `/api/auth/verify-phone-number?phoneNumber=${encodeURIComponent(phoneNumber)}`,
     ).then((r) => r.json());
     phoneNumberVerificationContext = context;
   }
 
   async function onSubmitVerification() {
     const { context, options, userExists } = await fetch(
-      `./api/auth/credential`,
+      `/api/auth/credential`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -43,7 +43,7 @@
       return;
     }
 
-    const { token: t } = await fetch(`./api/auth/credential/existing`, {
+    const { token: t } = await fetch(`/api/auth/credential/existing`, {
       method: "POST",
       body: JSON.stringify({
         attestation,
@@ -70,7 +70,7 @@
       return;
     }
 
-    const { token: t } = await fetch(`./api/auth/credential/new`, {
+    const { token: t } = await fetch(`/api/auth/credential/new`, {
       method: "POST",
       body: JSON.stringify({
         attestation,

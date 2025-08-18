@@ -4,7 +4,7 @@
 
   async function onsubmit() {
     const { assertion, assertionContext } = await fetch(
-      `./api/auth/assertion?phoneNumber=${encodeURIComponent(phoneNumber)}`,
+      `/api/auth/assertion?phoneNumber=${encodeURIComponent(phoneNumber)}`,
     ).then((r) => r.json());
     const assertionResult = await navigator.credentials.get({
       publicKey: PublicKeyCredential.parseRequestOptionsFromJSON(assertion),
@@ -13,7 +13,7 @@
       alert("Not public key credentials");
       return;
     }
-    const { token: t } = await fetch("./api/auth/assertion", {
+    const { token: t } = await fetch("/api/auth/assertion", {
       method: "POST",
       body: JSON.stringify({
         assertion: assertionResult,
