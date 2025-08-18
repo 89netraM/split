@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>4e69a98b-c772-40a5-b87e-a85e0bf29671</UserSecretsId>
+    <RootNamespace>Split.Application.Api</RootNamespace>
+    <AssemblyName>Split.Application.Api</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Infrastructure\Repositories\Repositories.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Swish\Swish.csproj" />
+    <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Domain\Transaction\Transaction.csproj" />
+    <ProjectReference Include="..\..\Domain\User\User.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\Encryptor\Encryptor.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\PhoneNumberVerifier\PhoneNumberVerifier.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fido2.AspNet" />
+    <PackageReference Include="Mediator.SourceGenerator">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
+</Project>

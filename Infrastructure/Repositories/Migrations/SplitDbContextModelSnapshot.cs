@@ -109,6 +109,37 @@ namespace Split.Infrastructure.Repositories.Migrations
                     b.Navigation("Amount")
                         .IsRequired();
                 });
+
+            modelBuilder.Entity("Split.Domain.User.UserAggregate", b =>
+                {
+                    b.OwnsMany("Split.Domain.User.AuthKeyEntity", "AuthKeys", b1 =>
+                        {
+                            b1.Property<string>("Id")
+                                .HasColumnType("text");
+
+                            b1.Property<byte[]>("Key")
+                                .IsRequired()
+                                .HasColumnType("bytea");
+
+                            b1.Property<long>("SignCount")
+                                .HasColumnType("bigint");
+
+                            b1.Property<string>("UserAggregateId")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("UserAggregateId");
+
+                            b1.ToTable("AuthKeyEntity");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserAggregateId");
+                        });
+
+                    b.Navigation("AuthKeys");
+                });
 #pragma warning restore 612, 618
         }
     }
