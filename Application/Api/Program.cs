@@ -46,7 +46,7 @@ builder.Services.AddTransient<IFido2>(sp => new Fido2(sp.GetRequiredService<IOpt
 
 var app = builder.Build();
 
-app.MapOpenApi();
+app.MapOpenApi("/api/openapi/{documentName}.json");
 
 app.MapDefaultEndpoints();
 
