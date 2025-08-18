@@ -9,16 +9,16 @@
   let userName = $state("");
   let token: string | null = $state(null);
 
-  async function onSubmitPhoneNumber(e: SubmitEvent) {
+  async function onSubmitPhoneNumber() {
     const { context } = await fetch(
-      `http://localhost:5223/api/auth/verify-phone-number?phoneNumber=${encodeURIComponent(phoneNumber)}`,
+      `./api/auth/verify-phone-number?phoneNumber=${encodeURIComponent(phoneNumber)}`,
     ).then((r) => r.json());
     phoneNumberVerificationContext = context;
   }
 
-  async function onSubmitVerification(e: SubmitEvent) {
+  async function onSubmitVerification() {
     const { context, options, userExists } = await fetch(
-      `http://localhost:5223/api/auth/credential`,
+      `./api/auth/credential`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -43,25 +43,22 @@
       return;
     }
 
-    const { token: t } = await fetch(
-      `http://localhost:5223/api/auth/credential/existing`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          attestation,
-          challengeContext: context,
-        }),
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const { token: t } = await fetch(`./api/auth/credential/existing`, {
+      method: "POST",
+      body: JSON.stringify({
+        attestation,
+        challengeContext: context,
+      }),
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
       },
-    ).then((r) => r.json());
+    }).then((r) => r.json());
     challengeContext = context;
     token = t;
   }
 
-  async function onSubmitUserName(e: SubmitEvent) {
+  async function onSubmitUserName() {
     if (publicKey == null) {
       alert("Public key is null, how did you get here?");
       return;
@@ -73,21 +70,18 @@
       return;
     }
 
-    const { token: t } = await fetch(
-      `http://localhost:5223/api/auth/credential/new`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          attestation,
-          challengeContext,
-          userName,
-        }),
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const { token: t } = await fetch(`./api/auth/credential/new`, {
+      method: "POST",
+      body: JSON.stringify({
+        attestation,
+        challengeContext,
+        userName,
+      }),
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json",
       },
-    ).then((r) => r.json());
+    }).then((r) => r.json());
     token = t;
   }
 </script>
@@ -99,7 +93,7 @@
       <input
         type="tel"
         bind:value={phoneNumber}
-        pattern="^\+467\d{'{'}8{'}'}$"
+        pattern="^\+467\d{'{'}8}$"
         required
         placeholder="+467XXXXXXXX"
       />

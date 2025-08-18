@@ -2,9 +2,9 @@
   let phoneNumber = $state("");
   let token: string | null = $state(null);
 
-  async function onsubmit(e: SubmitEvent) {
+  async function onsubmit() {
     const { assertion, assertionContext } = await fetch(
-      `http://localhost:5223/api/auth/assertion?phoneNumber=${encodeURIComponent(phoneNumber)}`,
+      `./api/auth/assertion?phoneNumber=${encodeURIComponent(phoneNumber)}`,
     ).then((r) => r.json());
     const assertionResult = await navigator.credentials.get({
       publicKey: PublicKeyCredential.parseRequestOptionsFromJSON(assertion),
@@ -13,7 +13,7 @@
       alert("Not public key credentials");
       return;
     }
-    const { token: t } = await fetch("http://localhost:5223/api/auth/assertion", {
+    const { token: t } = await fetch("./api/auth/assertion", {
       method: "POST",
       body: JSON.stringify({
         assertion: assertionResult,
@@ -23,7 +23,7 @@
       headers: {
         "Content-Type": "application/json",
       },
-    }).then(r => r.json());
+    }).then((r) => r.json());
     token = t;
   }
 </script>
@@ -34,7 +34,7 @@
       <input
         type="tel"
         bind:value={phoneNumber}
-        pattern="^\+467\d{'{'}8{'}'}$"
+        pattern="^\+467\d{'{'}8}$"
         required
         placeholder="+467XXXXXXXX"
       />

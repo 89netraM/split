@@ -2,6 +2,7 @@ using System;
 using Fido2NetLib;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -37,13 +38,6 @@ builder
         policy => policy.RequireAuthenticatedUser().AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
     );
 
-builder.Services.AddCors(options =>
-    options.AddPolicy(
-        name: "ApiCorsPolicy",
-        policy => policy.WithOrigins("http://localhost:5173").WithHeaders("Content-Type")
-    )
-);
-
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.TypeInfoResolverChain.Add(AuthSerializerContext.Default)
 );
@@ -52,12 +46,7 @@ builder.Services.AddTransient<IFido2>(sp => new Fido2(sp.GetRequiredService<IOpt
 
 var app = builder.Build();
 
-app.UseCors();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapOpenApi();
 
 app.MapDefaultEndpoints();
 
@@ -65,10 +54,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 var apiEndpoints = app.MapGroup("/api");
-apiEndpoints.RequireCors("ApiCorsPolicy");
 
 apiEndpoints.MapAuthEndpoints();
 
-apiEndpoints.MapGet("/secret", () => "Secret!").RequireAuthorization("AuthenticatedUser");
+apiEndpoints
+    .MapGet("/secret", () => "Secret!")
+    .RequireAuthorization("AuthenticatedUser")
+    .WithDescription("A dummy secret for testing tokens.")
+    .Produces<string>();
 
 app.Run();
