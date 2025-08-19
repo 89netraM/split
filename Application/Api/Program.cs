@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Scalar.AspNetCore;
 using Split.Application.Api;
 using Split.Domain.Transaction;
 using Split.Domain.User;
@@ -38,10 +37,19 @@ builder
         "AuthenticatedUser",
         policy => policy.RequireAuthenticatedUser().AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
     );
+builder
+    .Services.AddHttpContextAccessor()
+    .AddScoped(sp =>
+        sp.GetRequiredService<IHttpContextAccessor>().HttpContext
+        ?? throw new ArgumentNullException(nameof(IHttpContextAccessor.HttpContext))
+    );
 
 builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.TypeInfoResolverChain.Add(AuthSerializerContext.Default)
-);
+{
+    options.SerializerOptions.TypeInfoResolverChain.Add(AuthSerializerContext.Default);
+    options.SerializerOptions.TypeInfoResolverChain.Add(UserSerializerContext.Default);
+    options.SerializerOptions.TypeInfoResolverChain.Add(TransactionSerializerContext.Default);
+});
 builder.Services.AddOptions<Fido2Configuration>().BindConfiguration("Fido2");
 builder.Services.AddTransient<IFido2>(sp => new Fido2(sp.GetRequiredService<IOptions<Fido2Configuration>>().Value));
 
@@ -57,11 +65,7 @@ app.UseAuthorization();
 var apiEndpoints = app.MapGroup("/api");
 
 apiEndpoints.MapAuthEndpoints();
-
-apiEndpoints
-    .MapGet("/secret", () => "Secret!")
-    .RequireAuthorization("AuthenticatedUser")
-    .WithDescription("A dummy secret for testing tokens.")
-    .Produces<string>();
+apiEndpoints.MapUsersEndpoints().RequireAuthorization("AuthenticatedUser");
+apiEndpoints.MapTransactionsEndpoints().RequireAuthorization("AuthenticatedUser");
 
 app.Run();

@@ -11,11 +11,13 @@ public partial class Currency : IEquatable<Currency>
     [GeneratedRegex(@"^[A-Z]{3}$")]
     private static partial Regex CurrencyValidator { get; }
 
+    public static bool IsValid(string value) => CurrencyValidator.IsMatch(value);
+
     public string Value { get; }
 
     public Currency(string value)
     {
-        if (!CurrencyValidator.IsMatch(value))
+        if (!IsValid(value))
         {
             throw new ArgumentException("Invalid currency format", nameof(value));
         }
