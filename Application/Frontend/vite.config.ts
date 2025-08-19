@@ -6,5 +6,6 @@ export default defineConfig({
   server: {
     port: Number(process.env.PORT),
     strictPort: true,
+    allowedHosts: ["host.containers.internal", "host.docker.internal"],
   },
 });
