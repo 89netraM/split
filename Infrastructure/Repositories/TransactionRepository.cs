@@ -15,16 +15,19 @@ public class TransactionRepository(SplitDbContext dbContext, IMediator mediator)
         TransactionId transactionId,
         CancellationToken cancellationToken
     ) =>
-        await dbContext.Transactions //.Include(t => t.RecipientIds)
-        .FirstOrDefaultAsync(u => u.Id == transactionId, cancellationToken);
+        await dbContext.Transactions.FirstOrDefaultAsync(
+            t => t.Id == transactionId && t.RemovedAt == null,
+            cancellationToken
+        );
 
     public IAsyncEnumerable<TransactionAggregate> GetTransactionsInvolvingUserAsync(
         UserId userId,
         CancellationToken cancellationToken
     ) =>
         dbContext
-            .Transactions //.Include(t => t.RecipientIds)
-            .Where(t => t.SenderId == userId || t.RecipientIds.Any(rId => rId == userId))
+            .Transactions.Where(t =>
+                (t.SenderId == userId || t.RecipientIds.Any(rId => rId == userId)) && t.RemovedAt == null
+            )
             .AsAsyncEnumerable();
 
     public async Task SaveAsync(TransactionAggregate transaction, CancellationToken cancellationToken)
