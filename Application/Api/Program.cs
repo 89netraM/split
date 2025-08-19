@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Scalar.AspNetCore;
 using Split.Application.Api;
 using Split.Domain.Transaction;
 using Split.Domain.User;
@@ -46,7 +47,7 @@ builder.Services.AddTransient<IFido2>(sp => new Fido2(sp.GetRequiredService<IOpt
 
 var app = builder.Build();
 
-app.MapOpenApi("/api/openapi/{documentName}.json");
+app.MapOpenApi();
 
 app.MapDefaultEndpoints();
 
