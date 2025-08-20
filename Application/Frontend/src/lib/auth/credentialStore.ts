@@ -1,12 +1,17 @@
 import { writable } from "svelte/store";
+import { browser } from "$app/environment";
 
 const key = "auth";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface CredentialStore {}
+export interface CredentialStore {
+  phoneNumber: string | null;
+  token: string;
+}
 
 export const credentialStore = writable<CredentialStore | null>(
-  JSON.parse(localStorage.getItem(key) ?? "null"),
+  browser ? JSON.parse(localStorage.getItem(key) ?? "null") : null,
 );
 
-credentialStore.subscribe((v) => localStorage.setItem(key, JSON.stringify(v)));
+credentialStore.subscribe((v) => {
+  if (browser) localStorage.setItem(key, JSON.stringify(v));
+});
