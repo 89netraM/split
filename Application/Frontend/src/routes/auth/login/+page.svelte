@@ -40,6 +40,8 @@
   }
 </script>
 
+<svelte:head><title>Split - Login</title></svelte:head>
+
 {#if action == null}
   <form {onsubmit}>
     <label>

@@ -49,6 +49,8 @@
   }
 </script>
 
+<svelte:head><title>Split - New Transaction</title></svelte:head>
+
 <h2>New Transaction</h2>
 
 {#if action == null}
