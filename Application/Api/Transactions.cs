@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using Mediator;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Routing;
 using Split.Domain.Primitives;
 using Split.Domain.Transaction;
 using Split.Domain.Transaction.Events;
+using Split.Domain.User.Events;
 
 namespace Split.Application.Api;
 
@@ -76,18 +79,47 @@ public static class Transactions
             return Results.BadRequest("Amount is malformed.");
         }
 
-        if (request.RecipientIds is [])
+        if (request.Recipients is [])
         {
             return Results.BadRequest("RecipientIds is empty.");
         }
 
+        if (
+            !request.Recipients.All(r =>
+                r is RecipientWithId
+                || (r is RecipientWithPhoneNumber { PhoneNumber: var phoneNumber } && PhoneNumber.IsValid(phoneNumber))
+            )
+        )
+        {
+            return Results.BadRequest(
+                "Not all recipients are well-formatted, each requires an ID or a well-formatted phone number."
+            );
+        }
+
+        var recipientIds = await request
+            .Recipients.ToAsyncEnumerable()
+            .SelectAwaitWithCancellation(
+                async (r, ct) =>
+                    r switch
+                    {
+                        RecipientWithId { Id: var id } => new UserId(id),
+                        RecipientWithPhoneNumber { PhoneNumber: var phoneNumber } => (
+                            await sender.Send(new PhoneNumberQuery(new(phoneNumber)), ct)
+                        )
+                            .User
+                            ?.Id,
+                        _ => null,
+                    }
+            )
+            .ToArrayAsync(cancellationToken);
+
+        if (recipientIds.Any(r => r is null))
+        {
+            return Results.BadRequest("Not all recipients could be found.");
+        }
+
         var response = await sender.Send(
-            new Domain.Transaction.Events.CreateTransactionRequest(
-                amount,
-                request.Description,
-                userId,
-                [.. request.RecipientIds.Select(id => new UserId(id))]
-            ),
+            new Domain.Transaction.Events.CreateTransactionRequest(amount, request.Description, userId, recipientIds!),
             cancellationToken
         );
 
@@ -145,8 +177,50 @@ public record CreateTransactionRequest(
     [property: JsonPropertyName("amount")] Money Amount,
     [property: JsonPropertyName("description"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         string? Description,
-    [property: JsonPropertyName("recipientIds")] string[] RecipientIds
+    [property: JsonPropertyName("recipients")] Recipient[] Recipients
 );
+
+[JsonConverter(typeof(RecipientConverter))]
+[JsonDerivedType(typeof(RecipientWithId), typeDiscriminator: null!)]
+[JsonDerivedType(typeof(RecipientWithPhoneNumber), typeDiscriminator: null!)]
+public abstract record Recipient();
+
+public record RecipientWithId([property: JsonPropertyName("id")] string Id) : Recipient();
+
+public record RecipientWithPhoneNumber([property: JsonPropertyName("phoneNumber")] string PhoneNumber) : Recipient();
+
+public sealed class RecipientConverter : JsonConverter<Recipient>
+{
+    public override Recipient? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var document = JsonDocument.ParseValue(ref reader).RootElement;
+        if (document.TryGetProperty("id", out var id))
+        {
+            return new RecipientWithId(id.GetString() ?? throw new JsonException(""));
+        }
+        if (document.TryGetProperty("phoneNumber", out var phoneNumber))
+        {
+            return new RecipientWithPhoneNumber(phoneNumber.GetString() ?? throw new JsonException(""));
+        }
+        throw new JsonException();
+    }
+
+    public override void Write(Utf8JsonWriter writer, Recipient value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        if (value is RecipientWithId { Id: var id })
+        {
+            writer.WritePropertyName("id");
+            writer.WriteStringValue(id);
+        }
+        else if (value is RecipientWithPhoneNumber { PhoneNumber: var phoneNumber })
+        {
+            writer.WritePropertyName("phoneNumber");
+            writer.WriteStringValue(phoneNumber);
+        }
+        writer.WriteEndObject();
+    }
+}
 
 public sealed record Balance(
     [property: JsonPropertyName("from")] string From,

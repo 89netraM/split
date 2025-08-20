@@ -22,6 +22,8 @@ public static class Users
     {
         var group = routeBuilder.MapGroup("/users");
 
+        group.MapGet("/me", GetMe).Produces<User>().WithDescription("Gets info about the requesting user.");
+
         group
             .MapGet("/me/associates", GetMyAssociates)
             .Produces<IEnumerable<User>>()
@@ -33,6 +35,22 @@ public static class Users
             .WithDescription("Gets the balances of the requesting user compared to all associated users.");
 
         return group;
+    }
+
+    private static async Task<IResult> GetMe(
+        [FromServices] ISender sender,
+        [FromServices] HttpContext httpContext,
+        CancellationToken cancellationToken
+    )
+    {
+        if (httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) is not string id)
+        {
+            return Results.BadRequest("Subject not found on JWT.");
+        }
+
+        var userId = new UserId(id);
+        var response = await sender.Send(new UserQuery(userId), cancellationToken);
+        return response.User is { } user ? Results.Ok(User.FromDomain(user)) : Results.NotFound();
     }
 
     private static async Task<IResult> GetMyAssociates(

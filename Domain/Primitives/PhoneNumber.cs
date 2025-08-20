@@ -11,11 +11,13 @@ public partial class PhoneNumber : IEquatable<PhoneNumber>
     [GeneratedRegex(@"^\+\d+$")]
     private static partial Regex PhoneNumberValidator { get; }
 
+    public static bool IsValid(string value) => PhoneNumberValidator.IsMatch(value);
+
     public string Value { get; }
 
     public PhoneNumber(string value)
     {
-        if (!PhoneNumberValidator.IsMatch(value))
+        if (!IsValid(value))
         {
             throw new PhoneNumberFormatException(value, nameof(value));
         }

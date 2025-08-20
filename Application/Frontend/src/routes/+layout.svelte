@@ -23,10 +23,14 @@
   }
 </script>
 
-<h1>Split</h1>
-
 {#if unauthenticated(page) || isValid($credentialStore)}
   {@render children()}
+
+  <nav>
+    <ul>
+      <li><a href="/">Home</a></li>
+    </ul>
+  </nav>
 {:else if $credentialStore != null}
   <p>
     <a href="/auth/login?redirect={encodeURIComponent(page.url.pathname)}"

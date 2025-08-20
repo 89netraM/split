@@ -1,1 +1,1 @@
-<p>You are signed in!</p>
+<p><a href="/transaction">Create transaction</a></p>
