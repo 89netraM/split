@@ -83,7 +83,22 @@ public static class Users
         var userId = new UserId(id);
 
         var response = await sender.Send(new BalanceQuery(userId), cancellationToken);
-        return Results.Ok(response.Balances.Select(Balance.FromDomain));
+        var balances = await response
+            .Balances.ToAsyncEnumerable()
+            .SelectAwaitWithCancellation(
+                async (b, ct) =>
+                {
+                    var from = await sender.Send(new UserQuery(b.From), ct);
+                    var to = await sender.Send(new UserQuery(b.To), ct);
+                    return new Balance(
+                        User.FromDomain(from.User!),
+                        User.FromDomain(to.User!),
+                        Money.FromDomain(b.Amount)
+                    );
+                }
+            )
+            .ToArrayAsync(cancellationToken);
+        return Results.Ok(balances);
     }
 }
 
@@ -96,5 +111,12 @@ public record User(
     public static User FromDomain(UserAggregate user) => new(user.Id.Value, user.Name, user.PhoneNumber.Value);
 }
 
+public sealed record Balance(
+    [property: JsonPropertyName("from")] User From,
+    [property: JsonPropertyName("to")] User To,
+    [property: JsonPropertyName("amount")] Money Amount
+);
+
 [JsonSerializable(typeof(User))]
+[JsonSerializable(typeof(Balance))]
 public sealed partial class UserSerializerContext : JsonSerializerContext;

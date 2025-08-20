@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from "$app/state";
   import { fetchWithToken } from "$lib/auth/fetchWithToken";
   import RecipientsInput from "./RecipientsInput.svelte";
 
@@ -53,7 +54,11 @@
 {#if action == null}
   <form {onsubmit} onkeydowncapture={preventSubmitOnEnter}>
     <label for="recipients">Recipients</label>
-    <RecipientsInput numberId="recipients" bind:recipients />
+    <RecipientsInput
+      numberId="recipients"
+      associates={page.data.associates}
+      bind:recipients
+    />
     <label>
       Amount
       <input type="number" min="0" required bind:value={amount} />

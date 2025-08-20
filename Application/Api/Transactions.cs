@@ -222,17 +222,6 @@ public sealed class RecipientConverter : JsonConverter<Recipient>
     }
 }
 
-public sealed record Balance(
-    [property: JsonPropertyName("from")] string From,
-    [property: JsonPropertyName("to")] string To,
-    [property: JsonPropertyName("amount")] Money Amount
-)
-{
-    public static Balance FromDomain(Domain.Transaction.Balance balance) =>
-        new(balance.From.Value, balance.To.Value, Money.FromDomain(balance.Amount));
-}
-
 [JsonSerializable(typeof(Transaction))]
-[JsonSerializable(typeof(Balance))]
 [JsonSerializable(typeof(CreateTransactionRequest))]
 public sealed partial class TransactionSerializerContext : JsonSerializerContext;

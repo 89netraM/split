@@ -29,6 +29,7 @@
   <nav>
     <ul>
       <li><a href="/">Home</a></li>
+      <li><a href="/balances">Balances</a></li>
     </ul>
   </nav>
 {:else if $credentialStore != null}

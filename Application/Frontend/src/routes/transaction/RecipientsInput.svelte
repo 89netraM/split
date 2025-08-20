@@ -1,10 +1,16 @@
 <script lang="ts">
-  import { page } from "$app/state";
   import type { User } from "../../models/User";
 
-  let { numberId, recipients = $bindable([]) } = $props();
+  let {
+    numberId,
+    associates,
+    recipients = $bindable([]),
+  }: {
+    numberId: string;
+    associates: ReadonlyArray<User>;
+    recipients: Array<Recipient>;
+  } = $props();
 
-  let associates: ReadonlyArray<User> = page.data.associates;
   let phoneNumberElement: HTMLInputElement;
 
   function addRecipient(user: Recipient): void {
