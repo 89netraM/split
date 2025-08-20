@@ -1,34 +1,40 @@
 <script lang="ts">
-  import { page } from "$app/state";
+  import { goto } from "$app/navigation";
   import type { Balance } from "../../models/Balance";
-  import type { User } from "../../models/User";
 
-  const me: User = page.data.me;
-  const balances: ReadonlyArray<Balance> = page.data.balances;
+  let { data } = $props();
+
+  function settleDebt(balance: Balance): void {
+    goto("/balances/settle", { state: { balance } });
+  }
 </script>
-
-<svelte:head><title>Split - Balances</title></svelte:head>
 
 <h2>Balances</h2>
 
-{#each balances as balance ([balance.from.id, balance.to.id]
+{#each data.balances as balance ([balance.from.id, balance.to.id]
   .sort()
   .join("<key-center>"))}
   <span>
-    {#if balance.from.id === me.id}
+    {#if balance.from.id === data.me.id}
       <strong>{balance.from.name}</strong>
     {:else}
       {balance.from.name}
     {/if}
   </span>
   <span>
-    {#if balance.to.id === me.id}
+    {#if balance.to.id === data.me.id}
       <strong>{balance.to.name}</strong>
     {:else}
       {balance.to.name}
     {/if}
   </span>
   <span>{balance.amount.amount} {balance.amount.currency}</span>
+  {#if balance.from.id !== data.me.id && balance.amount.amount > 0 && balance.amount.currency === "SEK"}
+    <a
+      href="/balance/settle"
+      onclick={(e) => (settleDebt(balance), e.preventDefault())}>Settle</a
+    >
+  {/if}
 {:else}
   <p>No balances yet</p>
   <p>Go <a href="/transaction">make a transaction</a></p>

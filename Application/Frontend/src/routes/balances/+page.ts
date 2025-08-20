@@ -1,7 +1,11 @@
 import { fetchWithToken } from "$lib/auth/fetchWithToken";
-import type { PageLoad } from "./$types";
+import type { Balance } from "../../models/Balance.js";
+import type { User } from "../../models/User.js";
 
-export const load: PageLoad = async ({ fetch }) => {
+export async function load({ fetch }): Promise<{
+  balances: ReadonlyArray<Balance>;
+  me: User;
+}> {
   const [balances, me] = await Promise.all([
     fetchWithToken("/api/users/me/balances", {
       fetch,
@@ -9,4 +13,4 @@ export const load: PageLoad = async ({ fetch }) => {
     fetchWithToken("/api/users/me", { fetch }).then((r) => r.json()),
   ]);
   return { balances, me };
-};
+}
