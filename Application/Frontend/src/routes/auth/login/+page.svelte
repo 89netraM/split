@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { credentialStore } from "$lib/auth/credentialStore";
+  import { formatPhoneNumber } from "$lib/phoneNumber";
 
   const redirect = page.url.searchParams.get("redirect");
 
@@ -11,8 +12,9 @@
 
   function onsubmit() {
     action = (async () => {
+      const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
       const { assertion, assertionContext } = await fetch(
-        `/api/auth/assertion?phoneNumber=${encodeURIComponent(phoneNumber)}`,
+        `/api/auth/assertion?phoneNumber=${encodeURIComponent(formattedPhoneNumber)}`,
       ).then((r) => r.json());
       const assertionResult = await navigator.credentials.get({
         publicKey: PublicKeyCredential.parseRequestOptionsFromJSON(assertion),
@@ -52,7 +54,7 @@
           <input
             type="tel"
             bind:value={phoneNumber}
-            pattern="^\+467\d{'{'}8}$"
+            pattern="^\s*(?:\+46|0)(?:(?:\s|\-)?\d){'{'}9}\s*$"
             required
             placeholder=""
           />

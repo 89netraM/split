@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { formatPhoneNumber } from "$lib/phoneNumber";
   import type { User } from "../../models/User";
 
   let {
@@ -25,16 +26,15 @@
     } finally {
       phoneNumberElement.required = recipients.length === 0;
     }
-    if (recipients.some((r) => r.phoneNumber === phoneNumberElement.value)) {
+    const phoneNumber = formatPhoneNumber(phoneNumberElement.value);
+    if (recipients.some((r) => r.phoneNumber === phoneNumber)) {
       return;
     }
-    const associate = associates.find(
-      (a) => a.phoneNumber === phoneNumberElement.value,
-    );
+    const associate = associates.find((a) => a.phoneNumber === phoneNumber);
     if (associate != null) {
       recipients.push(associate);
     } else {
-      recipients.push({ phoneNumber: phoneNumberElement.value });
+      recipients.push({ phoneNumber: phoneNumber });
     }
     phoneNumberElement.value = "";
   }
@@ -62,7 +62,7 @@
   id={numberId}
   bind:this={phoneNumberElement}
   type="tel"
-  pattern="^\+467\d{'{'}8}$"
+  pattern="^\s*(?:\+46|0)(?:(?:\s|\-)?\d){'{'}9}\s*$"
   required={recipients.length === 0}
   placeholder=""
   onkeydowncapture={(e) => {

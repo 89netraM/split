@@ -35,7 +35,7 @@
         <input
           type="tel"
           bind:value={phoneNumber}
-          pattern="^\+467\d{'{'}8}$"
+          pattern="^\s*(?:\+46|0)(?:(?:\s|\-)?\d){'{'}9}\s*$"
           required
           placeholder=""
         />
