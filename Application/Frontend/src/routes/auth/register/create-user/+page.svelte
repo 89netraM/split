@@ -58,17 +58,21 @@
 
 {#if action == null}
   <form {onsubmit}>
-    <label>
-      Name:
-      <input bind:value={userName} required />
-    </label>
-    <button type="submit">Create user</button>
+    <p>
+      <label>
+        <span>Name:</span>
+        <input bind:value={userName} required placeholder="" />
+      </label>
+    </p>
+    <p>
+      <button type="submit">Create user</button>
+    </p>
   </form>
 {:else}
   {#await action}
-    Loading...
+    <p>Loading...</p>
   {:then}
-    Redirecting...
+    <p>Redirecting...</p>
   {:catch e}
     <p>{e.message}</p>
   {/await}

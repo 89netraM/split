@@ -4,4 +4,7 @@
 
 <svelte:head><title>Split - Register</title></svelte:head>
 
-{@render children()}
+<div class="simple-form">
+  <h2>Register</h2>
+  {@render children()}
+</div>

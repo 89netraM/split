@@ -83,21 +83,26 @@
 
 {#if action == null}
   <form {onsubmit}>
-    <label>
-      Verification code:
-      <input
-        bind:value={phoneNumberVerificationCode}
-        autocomplete="one-time-code"
-        required
-      />
-    </label>
-    <button type="submit">Verify phone number</button>
+    <p>
+      <label>
+        <span>Verification code:</span>
+        <input
+          bind:value={phoneNumberVerificationCode}
+          autocomplete="one-time-code"
+          required
+          placeholder=""
+        />
+      </label>
+    </p>
+    <p>
+      <button type="submit">Verify phone number</button>
+    </p>
   </form>
 {:else}
   {#await action}
-    Loading...
+    <p>Loading...</p>
   {:then}
-    Redirecting...
+    <p>Redirecting...</p>
   {:catch e}
     <p>{e.message}</p>
   {/await}

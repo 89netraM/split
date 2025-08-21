@@ -51,34 +51,49 @@
 
 <svelte:head><title>Split - New Transaction</title></svelte:head>
 
-<h2>New Transaction</h2>
-
-{#if action == null}
-  <form {onsubmit} onkeydowncapture={preventSubmitOnEnter}>
-    <label for="recipients">Recipients</label>
-    <RecipientsInput
-      numberId="recipients"
-      associates={page.data.associates}
-      bind:recipients
-    />
-    <label>
-      Amount
-      <input type="number" min="0" required bind:value={amount} />
-    </label>
-    <label>
-      Description
-      <input type="text" bind:value={description} />
-    </label>
-    <button type="submit">Send</button>
-  </form>
-{:else}
-  {#await action}
-    <p>Sending transaction...</p>
-  {:then}
-    <p>Transaction sent</p>
-    <p><a href="/transaction" onclick={() => reset()}>New Transaction</a></p>
-    <p><a href="/">Back to Home</a></p>
-  {:catch e}
-    <p>{e.message}</p>
-  {/await}
-{/if}
+<div class="simple-form">
+  <h2>New Transaction</h2>
+  {#if action == null}
+    <form {onsubmit} onkeydowncapture={preventSubmitOnEnter}>
+      <p>
+        <label for="recipients"><span>Recipients</span></label>
+        <RecipientsInput
+          numberId="recipients"
+          associates={page.data.associates}
+          bind:recipients
+        />
+      </p>
+      <p>
+        <label>
+          <span>Amount</span>
+          <input
+            type="number"
+            min="0"
+            required
+            placeholder=""
+            bind:value={amount}
+          />
+        </label>
+      </p>
+      <p>
+        <label>
+          <span>Description</span>
+          <input type="text" placeholder="" bind:value={description} />
+        </label>
+      </p>
+      <p>
+        <button type="submit">Send</button>
+      </p>
+    </form>
+  {:else}
+    {#await action}
+      <p>Sending transaction...</p>
+    {:then}
+      <p>Transaction sent</p>
+      <p><a href="/transaction" onclick={() => reset()}>New Transaction</a></p>
+      <p><a href="/">Back to Home</a></p>
+    {:catch e}
+      <p>{e.message}</p>
+    {/await}
+  {/if}
+</div>

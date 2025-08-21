@@ -29,27 +29,33 @@
 
 {#if action == null}
   <form {onsubmit}>
-    <label>
-      Phone number:
-      <input
-        type="tel"
-        bind:value={phoneNumber}
-        pattern="^\+467\d{'{'}8}$"
-        required
-        placeholder="+467XXXXXXXX"
-      />
-    </label>
-    <label>
-      <input type="checkbox" bind:checked={savePhoneNumber} />
-      Save phone number
-    </label>
-    <button type="submit">Request verification code</button>
+    <p>
+      <label>
+        <span>Phone number</span>
+        <input
+          type="tel"
+          bind:value={phoneNumber}
+          pattern="^\+467\d{'{'}8}$"
+          required
+          placeholder=""
+        />
+      </label>
+    </p>
+    <p>
+      <label>
+        <span>Save phone number</span>
+        <input type="checkbox" bind:checked={savePhoneNumber} />
+      </label>
+    </p>
+    <p>
+      <button type="submit">Request verification code</button>
+    </p>
   </form>
 {:else}
   {#await action}
-    Sending code...
+    <p>Sending code...</p>
   {:then}
-    Redirecting...
+    <p>Redirecting...</p>
   {:catch e}
     <p>{e.message}</p>
   {/await}
