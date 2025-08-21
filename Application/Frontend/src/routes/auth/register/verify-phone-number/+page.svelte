@@ -88,6 +88,7 @@
         <span>Verification code:</span>
         <input
           bind:value={phoneNumberVerificationCode}
+          type="text"
           autocomplete="one-time-code"
           required
           placeholder=""

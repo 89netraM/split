@@ -61,7 +61,7 @@
     <p>
       <label>
         <span>Name:</span>
-        <input bind:value={userName} required placeholder="" />
+        <input bind:value={userName} type="text" required placeholder="" />
       </label>
     </p>
     <p>
