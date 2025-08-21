@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { page } from "$app/state";
   import { fetchWithToken } from "$lib/auth/fetchWithToken";
   import RecipientsInput from "./RecipientsInput.svelte";
+
+  let { data } = $props();
 
   let action: Promise<void> | null = $state(null);
 
@@ -59,7 +60,7 @@
         <label for="recipients"><span>Recipients</span></label>
         <RecipientsInput
           numberId="recipients"
-          associates={page.data.associates}
+          associates={data.associates}
           bind:recipients
         />
       </p>

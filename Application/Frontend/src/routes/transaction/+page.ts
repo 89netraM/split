@@ -1,10 +1,16 @@
+import { credentialStore, isValid } from "$lib/auth/credentialStore";
 import { fetchWithToken } from "$lib/auth/fetchWithToken";
+import { get } from "svelte/store";
 import type { User } from "../../models/User";
-import type { PageLoad } from "./$types";
 
 export const ssr = false;
 
-export const load: PageLoad = async ({ fetch }) => {
+export async function load({
+  fetch,
+}): Promise<{ associates: ReadonlyArray<User> }> {
+  if (!isValid(get(credentialStore))) {
+    return { associates: [] };
+  }
   const associates: ReadonlyArray<User> = await Promise.all([
     fetchWithToken("/api/users/me", { fetch }),
     fetchWithToken("/api/users/me/associates", { fetch }),
@@ -12,4 +18,4 @@ export const load: PageLoad = async ({ fetch }) => {
     .then(([me, associates]) => Promise.all([me.json(), associates.json()]))
     .then(([me, associates]) => [me, ...associates]);
   return { associates };
-};
+}

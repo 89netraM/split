@@ -22,7 +22,7 @@
       .sort()
       .join("<key-center>"))}
       <span class="from">
-        {#if balance.from.id === data.me.id}
+        {#if balance.from.id === data.me?.id}
           <strong>{balance.from.name}</strong>
         {:else}
           {balance.from.name}
@@ -34,13 +34,13 @@
         ).toFixed(2)}
       </span>
       <span class="to">
-        {#if balance.to.id === data.me.id}
+        {#if balance.to.id === data.me?.id}
           <strong>{balance.to.name}</strong>
         {:else}
           {balance.to.name}
         {/if}
       </span>
-      {#if balance.from.id !== data.me.id && balance.amount.amount > 0 && balance.amount.currency === "SEK"}
+      {#if balance.from.id !== data.me?.id && balance.amount.amount > 0 && balance.amount.currency === "SEK"}
         <a
           class="settle"
           href="/balance/settle"
