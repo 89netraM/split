@@ -3,7 +3,6 @@
     <Project Path="Application/Api/Api.csproj" />
     <Project Path="Application/AppHost/AppHost.csproj" />
     <Project Path="Application/ServiceDefaults/ServiceDefaults.csproj" />
-    <Project Path="Application/Web/Web.csproj" />
   </Folder>
   <Folder Name="/Domain/">
     <Project Path="Domain/User/User.csproj" />
@@ -20,12 +19,10 @@
     <Project Path="Infrastructure/Encryptor/Encryptor.csproj" />
     <Project Path="Infrastructure/PhoneNumberVerifier/PhoneNumberVerifier.csproj" />
     <Project Path="Infrastructure/Repositories/Repositories.csproj" />
-    <Project Path="Infrastructure/Swish/Swish.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/Tests/">
     <Project Path="Infrastructure/Tests/Encryptor/Encryptor.csproj" />
     <Project Path="Infrastructure/Tests/PhoneNumberVerifier/PhoneNumberVerifier.csproj" />
     <Project Path="Infrastructure/Tests/Repositories/Repositories.csproj" />
-    <Project Path="Infrastructure/Tests/Swish/Swish.csproj" />
   </Folder>
 </Solution>

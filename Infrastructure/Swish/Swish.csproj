@@ -1,9 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <RootNamespace>Split.Infrastructure.Swish</RootNamespace>
-    <AssemblyName>Split.Infrastructure.Swish</AssemblyName>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Domain\Primitives\Primitives.csproj" />
-  </ItemGroup>
-</Project>

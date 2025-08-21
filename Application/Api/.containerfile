@@ -8,7 +8,6 @@ COPY ./Domain/Primitives/Primitives.csproj ./Domain/Primitives/packages.lock.jso
 COPY ./Domain/User/User.csproj ./Domain/User/packages.lock.json ./Domain/User/
 COPY ./Domain/Transaction/Transaction.csproj ./Domain/Transaction/packages.lock.json ./Domain/Transaction/
 COPY ./Infrastructure/Repositories/Repositories.csproj ./Infrastructure/Repositories/packages.lock.json ./Infrastructure/Repositories/
-COPY ./Infrastructure/Swish/Swish.csproj ./Infrastructure/Swish/packages.lock.json ./Infrastructure/Swish/
 COPY ./Infrastructure/Encryptor/Encryptor.csproj ./Infrastructure/Encryptor/packages.lock.json ./Infrastructure/Encryptor/
 COPY ./Infrastructure/PhoneNumberVerifier/PhoneNumberVerifier.csproj ./Infrastructure/PhoneNumberVerifier/packages.lock.json ./Infrastructure/PhoneNumberVerifier/
 COPY ./Application/ServiceDefaults/ServiceDefaults.csproj ./Application/ServiceDefaults/packages.lock.json ./Application/ServiceDefaults/
@@ -20,7 +19,6 @@ COPY ./Domain/Primitives ./Domain/Primitives
 COPY ./Domain/User ./Domain/User
 COPY ./Domain/Transaction ./Domain/Transaction
 COPY ./Infrastructure/Repositories ./Infrastructure/Repositories
-COPY ./Infrastructure/Swish ./Infrastructure/Swish
 COPY ./Infrastructure/Encryptor ./Infrastructure/Encryptor
 COPY ./Infrastructure/PhoneNumberVerifier ./Infrastructure/PhoneNumberVerifier
 COPY ./Application/ServiceDefaults ./Application/ServiceDefaults
