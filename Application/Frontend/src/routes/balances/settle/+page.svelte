@@ -13,7 +13,7 @@
   let action: Promise<void> | null = $state(null);
 
   window.location.assign(
-    createSwishLink(balance.amount.amount, balance.from.id),
+    createSwishLink(balance.amount.amount, balance.from.phoneNumber),
   );
 
   function confirmSwish(): void {
