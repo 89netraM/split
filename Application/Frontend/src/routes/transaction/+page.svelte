@@ -90,11 +90,33 @@
     {#await action}
       <p>Sending transaction...</p>
     {:then}
-      <p>Transaction sent</p>
-      <p><a href="/transaction" onclick={() => reset()}>New Transaction</a></p>
-      <p><a href="/">Back to Home</a></p>
+      <div>
+        <p>Transaction sent</p>
+        <a class="link-button" href="/transaction" onclick={() => reset()}
+          >New Transaction</a
+        >
+        <a class="link-button" href="/">Back to Home</a>
+      </div>
     {:catch e}
       <p>{e.message}</p>
     {/await}
   {/if}
 </div>
+
+<style>
+  .simple-form {
+    > div {
+      grid-row: 2;
+      grid-column: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-block-end: 6rem;
+
+      > :first-child {
+        flex-grow: 1;
+      }
+    }
+  }
+</style>
