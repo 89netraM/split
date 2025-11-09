@@ -33,13 +33,13 @@ public sealed class IncreaseSignCountShould
     }
 
     [TestMethod]
-    public void ThrowWhenIncreasingByMoreThanOne()
+    public void ThrowWhenIncreasingByZero()
     {
         // Arrange
         var authKey = new AuthKeyEntity(new("auth-key-id"), [0x00], 1);
 
         // Act
-        void act() => authKey.IncreaseSignCount(3);
+        void act() => authKey.IncreaseSignCount(1);
 
         // Assert
         Assert.ThrowsExactly<SignCountIncreaseException>(act);

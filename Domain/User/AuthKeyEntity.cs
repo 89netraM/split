@@ -11,7 +11,7 @@ public class AuthKeyEntity(AuthKeyId id, byte[] key, uint signCount)
 
     public void IncreaseSignCount(uint signCount)
     {
-        if (SignCount + 1 != signCount)
+        if (SignCount >= signCount)
         {
             throw new SignCountIncreaseException(SignCount, signCount);
         }
@@ -20,4 +20,4 @@ public class AuthKeyEntity(AuthKeyId id, byte[] key, uint signCount)
 }
 
 internal class SignCountIncreaseException(uint current, uint next)
-    : Exception($"Only sequential sign key increases are possible, attempted from {current} to {next}.");
+    : Exception($"Signing key can only increase count, attempted from {current} to {next}.");
