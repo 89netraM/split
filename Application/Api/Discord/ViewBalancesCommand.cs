@@ -58,7 +58,9 @@ public sealed class ViewBalancesCommand(ISender sender) : InteractionModuleBase
         }
 
         IUser? discordUser =
-            await Context.Guild.GetUserAsync(discordId) ?? await Context.Client.GetUserAsync(discordId);
+            Context.Guild is { } guild && await guild.GetUserAsync(discordId) is { } guildUser
+                ? guildUser
+                : await Context.Client.GetUserAsync(discordId);
         return discordUser?.PrettyName() ?? user.Name;
     }
 }
