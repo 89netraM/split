@@ -55,6 +55,12 @@ public class SplitDbContext(DbContextOptions<SplitDbContext> options) : DbContex
         authKeyBuilder.HasKey(k => k.Id);
         authKeyBuilder.Property(k => k.Key);
         authKeyBuilder.Property(k => k.SignCount);
+
+        var alternateIdBuilder = userBuilder.OwnsMany(u => u.AlternateIds);
+        alternateIdBuilder.HasKey(ai => new { ai.Type, ai.Id });
+        alternateIdBuilder
+            .HasIndex(nameof(UserAggregate) + nameof(UserAggregate.Id), nameof(AlternateUserId.Type))
+            .IsUnique();
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

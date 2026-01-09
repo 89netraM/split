@@ -10,6 +10,7 @@ namespace Split.Domain.User;
 public class UserAggregate
 {
     public UserId Id { get; }
+    public ICollection<AlternateUserId> AlternateIds { get; }
     public string Name { get; }
     public PhoneNumber PhoneNumber { get; }
     public ICollection<AuthKeyEntity> AuthKeys { get; }
@@ -21,6 +22,7 @@ public class UserAggregate
     public UserAggregate(UserId id, string name, PhoneNumber phoneNumber, DateTimeOffset createdAt)
     {
         Id = id;
+        AlternateIds = [];
         Name = name;
         PhoneNumber = phoneNumber;
         AuthKeys = [];

@@ -70,6 +70,29 @@ public class UserService(
         return user;
     }
 
+    public async Task<UserAggregate?> GetUserByAlternateIdAsync(
+        AlternateUserId alternateUserId,
+        CancellationToken cancellationToken
+    )
+    {
+        logger.LogDebug("Retrieving user with alternate ID: {AlternateUserId}", alternateUserId);
+
+        var user = await userRepository.GetUserByAlternateIdAsync(alternateUserId, cancellationToken);
+        if (user is null)
+        {
+            logger.LogDebug("User with alternate ID: {AlternateUserId} does not exist", alternateUserId);
+            return null;
+        }
+        if (user.RemovedAt.HasValue)
+        {
+            logger.LogDebug("User with alternate ID: {AlternateUserId} has been removed", alternateUserId);
+            return null;
+        }
+
+        logger.LogDebug("Successfully retrieved user with alternate ID: {AlternateUserId}", user.Id);
+        return user;
+    }
+
     public async Task<UserAggregate?> GetUserByPhoneNumberAsync(
         PhoneNumber phoneNumber,
         CancellationToken cancellationToken

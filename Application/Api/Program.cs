@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Split.Application.Api;
+using Split.Application.Api.Discord;
 using Split.Domain.Transaction;
 using Split.Domain.User;
 using Split.Infrastructure.Encryptor;
@@ -52,6 +53,11 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 });
 builder.Services.AddOptions<Fido2Configuration>().BindConfiguration("Fido2");
 builder.Services.AddTransient<IFido2>(sp => new Fido2(sp.GetRequiredService<IOptions<Fido2Configuration>>().Value));
+
+builder
+    .Services.AddDiscordOptions()
+    .AddSingleton<DiscordService>()
+    .AddSingleton<IHostedService>(sp => sp.GetRequiredService<DiscordService>());
 
 var app = builder.Build();
 

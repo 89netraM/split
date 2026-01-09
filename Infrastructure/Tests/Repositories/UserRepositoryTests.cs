@@ -53,6 +53,32 @@ public class UserRepositoryTests : PostgresTestBase
     }
 
     [TestMethod]
+    public async Task ASavedUserWithAnAlternateIdShouldBeRetrievableByTheAlternateId()
+    {
+        // Arrange
+        var userRepository = Services.GetRequiredService<IUserRepository>();
+        var user = new UserAggregate(
+            new("user-id"),
+            "Test User",
+            new("+9123456789"),
+            new(2026, 01, 07, 20, 40, 00, new(00, 00, 00))
+        );
+        user.AlternateIds.Add(new("test-type", "alternate-id"));
+
+        // Act
+        await userRepository.SaveAsync(user, CancellationToken.None);
+        var result = await userRepository.GetUserByAlternateIdAsync(user.AlternateIds.First(), CancellationToken.None);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual(user.Id, result.Id);
+        Assert.AreEqual(user.Name, result.Name);
+        Assert.AreEqual(user.PhoneNumber, result.PhoneNumber);
+        Assert.AreEqual(user.CreatedAt, result.CreatedAt);
+        Assert.AreEqual(user.RemovedAt, result.RemovedAt);
+    }
+
+    [TestMethod]
     public async Task ASavedUserShouldBeRetrievableByPhoneNumber()
     {
         // Arrange

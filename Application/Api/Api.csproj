@@ -14,6 +14,7 @@
     <ProjectReference Include="..\..\Infrastructure\PhoneNumberVerifier\PhoneNumberVerifier.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Discord.NET" />
     <PackageReference Include="Fido2.AspNet" />
     <PackageReference Include="Mediator.SourceGenerator">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

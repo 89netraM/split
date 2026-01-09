@@ -14,6 +14,11 @@ public class InMemoryUserRepository(params IEnumerable<UserAggregate> users) : I
     public Task<UserAggregate?> GetUserByIdAsync(UserId userId, CancellationToken cancellationToken) =>
         Task.FromResult(Users.TryGetValue(userId, out var user) ? user : null);
 
+    public Task<UserAggregate?> GetUserByAlternateIdAsync(
+        AlternateUserId alternateUserId,
+        CancellationToken cancellationToken
+    ) => Task.FromResult(Users.Values.FirstOrDefault(user => user.AlternateIds.Contains(alternateUserId)));
+
     public Task<UserAggregate?> GetUserByPhoneNumberAsync(
         PhoneNumber phoneNumber,
         CancellationToken cancellationToken
