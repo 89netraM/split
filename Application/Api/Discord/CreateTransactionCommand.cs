@@ -54,6 +54,6 @@ public sealed class CreateTransactionCommand(ISender sender) : InteractionModule
             new Domain.Transaction.Events.CreateTransactionRequest(amount, description, user.Id, [recipient.Id])
         );
 
-        return $"Transaction created, you have sent {amountNumber:0.00} SEK to {receivingDiscordUser.PrettyName()}";
+        return $"Transaction created, {discordUser.PrettyName()} have sent {amountNumber:0.00} SEK to {receivingDiscordUser.PrettyName()}";
     }
 }

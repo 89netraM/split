@@ -13,7 +13,7 @@ public sealed class ViewBalancesCommand(ISender sender) : InteractionModuleBase
     [SlashCommand("view-balances", "Returns a list of your balances towards other users")]
     public async Task ViewBalances()
     {
-        await Context.Interaction.DeferAsync();
+        await Context.Interaction.DeferAsync(ephemeral: true);
 
         var status = await GetBalances(Context.User);
         await Context.Interaction.ModifyOriginalResponseAsync(message =>
@@ -37,8 +37,8 @@ public sealed class ViewBalancesCommand(ISender sender) : InteractionModuleBase
             .ToAsyncEnumerable()
             .SelectAwait(async b =>
                 b.From == user.Id
-                    ? $"{await GetNameOfUser(b.To)} owes you {b.Amount.Amount:0.00} {b.Amount.Currency}"
-                    : $"You owe {await GetNameOfUser(b.From)} {b.Amount.Amount:0.00} {b.Amount.Currency}"
+                    ? $":green_square: {await GetNameOfUser(b.To)} owes you {b.Amount.Amount:0.00} {b.Amount.Currency}"
+                    : $":red_square: You owe {await GetNameOfUser(b.From)} {b.Amount.Amount:0.00} {b.Amount.Currency}"
             )
             .ToListAsync();
 
